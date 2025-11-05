@@ -4,7 +4,7 @@ import logging
 
 FORMAT = "%(asctime)s %(message)s"
 logging.basicConfig(
-    format=FORMAT, filename="deduplicate.log", filemode="a", level=logging.INFO
+    format=FORMAT, filename="deduplicate.log", filemode="w", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
