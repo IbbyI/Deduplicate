@@ -4,10 +4,21 @@ import argparse
 from pathlib import Path
 
 from utils.log import log
-from utils.hash import hash_file
+from utils.search_duplicate import (
+    find_duplicates,
+    move_duplicates,
+    compare_files,
+    delete_duplicates,
+    confirm_delete,
+)
 
 
 def main(argv: list[str]) -> None:
+    """
+    Main Function to Run Deduplication Program.
+    Args:
+        argv (list[str]): List of Command Line Arguments.
+    """
     try:
         parser = argparse.ArgumentParser(
             prog="Deduplicate!",
@@ -23,7 +34,10 @@ def main(argv: list[str]) -> None:
             help="Given Path to Run Program",
         )
         parser.add_argument(
-            "--delete-duplicates", help="Delete All Duplicate Files Found."
+            "-del",
+            "--delete-duplicates",
+            action="store_true",
+            help="Delete All Duplicate Files Found.",
         )
         parser.add_argument(
             "-mv",
@@ -35,8 +49,10 @@ def main(argv: list[str]) -> None:
 
         args = parser.parse_args()
         start_path = Path(args.path[0])
-        duplicate_path = args.move_duplicates
-
+        duplicate_path = Path(args.move_duplicates[0]) if args.move_duplicates else None
+        delete_duplicates_flag = (
+            args.delete_duplicates if args.delete_duplicates else None
+        )
         if not start_path.exists():
             print("✘ Start Path Does Not Exist.")
             log(
@@ -46,29 +62,38 @@ def main(argv: list[str]) -> None:
             )
             sys.exit(2)
 
-        dict = {}
-        for file in start_path.iterdir():
-            hashed_file = hash_file(file)
-            dict.setdefault(hashed_file, []).append(file)
+        duplicate_group = find_duplicates(start_path)
+        duplicate_files = compare_files(duplicate_group)
 
-        duplicate_results = [value for value in dict.values() if len(value) > 1]
+        log(
+            level="info",
+            message=f"Completed with {len(duplicate_files)} duplicate sets.",
+        )
 
-        if not duplicate_results:
-            print(f"No Duplicates Found in {start_path}.\nTerminating Program...")
-            log(
-                level="info",
-                message=f"No Duplicates Found in {start_path}.\nTerminating Program...",
-            )
-            sys.exit()
+        if duplicate_path:
+            if not duplicate_path.exists():
+                Path.mkdir(duplicate_path)
+                log(level="info", message=f"Directory Created at: {duplicate_path}")
+            move_duplicates(duplicate_files, duplicate_path)
 
-        for duplicates in duplicate_results:
-            paths = [str(p) for p in duplicates]
-            print(f"{', '.join(paths)} are duplicates.")
-            log(level="info", message=f"{', '.join(paths)} are duplicates.")
+        if delete_duplicates_flag:
+            confirm = confirm_delete(duplicate_files)
+            if confirm:
+                delete_duplicates(duplicate_files)
 
-    except argparse.ArgumentError or TypeError as e:
-        print(e)
+    except argparse.ArgumentError:
+        log(level="error", message="Argument Parsing Error.", exc_info=True)
+        print("Argument Parsing Error.")
+        parser.print_help()
         sys.exit(2)
+    except TypeError as e:
+        log(level="error", message=f"Type Error: {e}", exc_info=True)
+        print(f"Type Error: {e}")
+        sys.exit(1)
+    except FileNotFoundError as e:
+        log(level="error", message=f"File Not Found: {e}", exc_info=True)
+        print(f"File Not Found: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
@@ -77,3 +102,4 @@ if __name__ == "__main__":
     main(sys.argv[1:])
     time_taken = time.time() - start_time
     log(level="info", message=f"Time Taken: {"%.2f" % time_taken}s")
+    print(f"Time Taken: {'%.2f' % time_taken}s")
