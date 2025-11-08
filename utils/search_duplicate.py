@@ -41,7 +41,7 @@ def find_duplicates(start_path: str) -> None:
 
 def compare_files(
     duplicate_results: list[list[Path]],
-) -> list:  # Optimize Function to Avoid Nested Loops O(n^2)
+) -> list:
     """
     Compare Duplicate Files and Select Newer One.
     Args:
