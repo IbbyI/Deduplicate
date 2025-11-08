@@ -18,9 +18,10 @@ def find_duplicates(start_path: str) -> None:
     print(f"Scanning Path '{start_path}' For Duplicate Files...")
 
     hashmap = {}
-    for file in start_path.rglob("*"):
-        hashed_file = hash_file(file)
-        hashmap.setdefault(hashed_file, []).append(file)
+    for file in Path(start_path).rglob("*"):
+        if file.is_file():
+            hashed_file = hash_file(file)
+            hashmap.setdefault(hashed_file, []).append(file)
 
     duplicate_results = [value for value in hashmap.values() if len(value) > 1]
 
@@ -55,8 +56,8 @@ def compare_files(
         newer_files = [f for f in group if f != oldest_file]
         result.extend(newer_files)
 
-    for f in newer_files:
-        print(f" - {f}")
+        for f in newer_files:
+            print(f" - {f}")
     return result
 
 
