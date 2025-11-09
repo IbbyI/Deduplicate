@@ -26,16 +26,15 @@ def find_duplicates(start_path: str) -> None:
     duplicate_results = [value for value in hashmap.values() if len(value) > 1]
 
     if not duplicate_results:
-        print(f"No Duplicates Found in Path: {start_path}\nTerminating Program...")
+        print(f"✔ No Duplicates Found in Path: {start_path}\nTerminating Program...")
         log(
             level="info",
-            message=f"No Duplicates Found in Path: {start_path}\nTerminating Program...",
+            message=f"✔ No Duplicates Found in Path: {start_path}\nTerminating Program...",
         )
         return []
     for duplicates in duplicate_results:
         paths = [str(p) for p in duplicates]
-        print(f"{', '.join(paths)} are identical..")
-        log(level="info", message=f"{', '.join(paths)} are identical.")
+        log(level="info", message=f"{' , '.join(paths)} are identical.")
     return duplicate_results
 
 
@@ -49,7 +48,7 @@ def compare_files(
     Returns:
         list: List of duplicate files, with the oldest file removed from each group.
     """
-    print(f"Duplicate Files Found:")
+    print("✔ Duplicate Files Found:")
     result = []
     for group in duplicate_results:
         oldest_file = min(group, key=lambda f: f.stat().st_mtime)
@@ -75,14 +74,10 @@ def move_duplicates(duplicate_files: list, move_path: str) -> None:
             print(f"Moving File: {f} to {move_path}")
             shutil.move(f, move_path)
             log(level="info", message=f"Moved Newer File {f} to {move_path}")
-    except OSError:
-        log(level="error", message=f"Could Not Move {duplicate_files}.", exc_info=True)
-    except shutil.Error:
-        log(level="error", message=f"Could Not Move {duplicate_files}.", exc_info=True)
-    except Exception as e:
-        log(level="error", message=f"Unexpected Error: {e}", exc_info=True)
-    finally:
-        print("Duplicate Files Successfully Moved.")
+    except (OSError, shutil.Error):
+        log(
+            level="error", message=f"✘ Could Not Move {duplicate_files}.", exc_info=True
+        )
 
 
 def delete_duplicates(duplicate_files: list) -> None:
@@ -96,12 +91,12 @@ def delete_duplicates(duplicate_files: list) -> None:
             remove(f)
     except OSError:
         log(
-            level="error", message=f"Could Not Delete {duplicate_files}.", exc_info=True
+            level="error",
+            message=f"✘ Could Not Delete {duplicate_files}.",
+            exc_info=True,
         )
     except Exception:
-        log(level="error", message="Unexpected Error", exc_info=True)
-    finally:
-        print("Duplicate Files Successfully Deleted.")
+        log(level="error", message="✘ Unexpected Error", exc_info=True)
 
 
 def confirm_delete(duplicate_files: list) -> bool:
@@ -115,6 +110,8 @@ def confirm_delete(duplicate_files: list) -> bool:
     for f in duplicate_files:
         print(f" - {f}")
     confirm = (
-        input("Are you sure you want to delete all duplicates? (Y/N): ").strip().lower()
+        input("⚠ Are you sure you want to delete all duplicates? (Y/N): ")
+        .strip()
+        .lower()
     )
     return confirm in ("y", "yes")
