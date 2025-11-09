@@ -34,7 +34,7 @@ It identifies identical files across nested folders and gives you the option to 
 ### 🔧 Command Syntax
 
 ```
-python dedupe.py -p <path> [-mv <destination>] [-del]
+python dedupe.py -p <path> [-mv <destination>] [-del] [-o <destination>] [-v]
 ```
 
 ### 🧩 Arguments
@@ -44,6 +44,8 @@ python dedupe.py -p <path> [-mv <destination>] [-del]
 | `-p`   | `--path`              | Path to search for duplicates                 | `-p ./Downloads`   |
 | `-mv`  | `--move-duplicates`   | Move duplicates to specified directory        | `-mv ./duplicates` |
 | `-del` | `--delete-duplicates` | Delete all duplicate files after confirmation | `-del`             |
+| `-v`   | `--version`           | Program Version Number                        | `v`                |
+| `-o`   | `--output-file`       | Path to save output file                      | `-o ./output.txt`  |
 
 ---
 
@@ -53,6 +55,12 @@ python dedupe.py -p <path> [-mv <destination>] [-del]
 
 ```
 python dedupe.py -p ./
+```
+
+**Find duplicates in current directory & create output file**
+
+```
+python dedupe.py -p ./ -o ./output.txt
 ```
 
 **Move all duplicates to a separate folder**
@@ -65,6 +73,12 @@ python dedupe.py -p ./Documents -mv ./Duplicates
 
 ```
 python dedupe.py -p ./test -del
+```
+
+**Get current version of program**
+
+```
+python dedupe.py -v
 ```
 
 ---
@@ -83,11 +97,10 @@ python dedupe.py -p ./test -del
 
 ```
 Scanning Path './test' For Duplicate Files...
-./test/a.txt, ./test/subdir/a_copy.txt are identical..
-Duplicate Files Found:
+✔ Duplicate Files Found:
  - ./test/subdir/a_copy.txt
-Are you sure you want to delete all duplicates? (Y/N): y
-Duplicate Files Successfully Deleted.
+⚠ Are you sure you want to delete all duplicates? (Y/N): y
+✔ Duplicate Files Successfully Deleted.
 ```
 
 ---
