@@ -92,6 +92,13 @@ Duplicate Files Successfully Deleted.
 
 ---
 
+## 🎯 Upcoming Features
+
+- ⛔ **Ignore Subdirectory** - Ignore specific paths from search.
+- 💬 **Verbose Flag** - Add verbose flag for easy debugging for users.
+
+---
+
 ## 🧑‍💻 Author
 
 Created by [**Ibby I.**](https://github.com/IbbyI)
