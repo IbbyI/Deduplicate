@@ -46,6 +46,20 @@ def main(argv: list[str]) -> None:
             type=str,
             help="Move Duplicate Files to given directory.",
         )
+        parser.add_argument(
+            "-o",
+            "--output-file",
+            nargs=1,
+            type=str,
+            help="Output File to Save Duplicate Results.",
+        )
+        parser.add_argument(
+            "-v",
+            "--version",
+            action="version",
+            version="Deduplicate! 1.0.0",
+            help="Show Program Version.",
+        )
 
         args = parser.parse_args()
         start_path = Path(args.path[0])
@@ -53,6 +67,8 @@ def main(argv: list[str]) -> None:
         delete_duplicates_flag = (
             args.delete_duplicates if args.delete_duplicates else None
         )
+        output_file = Path(args.output_file[0]) if args.output_file else None
+
         if not start_path.exists():
             print("✘ Start Path Does Not Exist.")
             log(
@@ -67,7 +83,7 @@ def main(argv: list[str]) -> None:
 
         log(
             level="info",
-            message=f"Completed with {len(duplicate_files)} duplicate sets.",
+            message=f"✔ Completed Search! Found {len(duplicate_files)} duplicate files!",
         )
 
         if duplicate_path:
@@ -81,18 +97,34 @@ def main(argv: list[str]) -> None:
             if confirm:
                 delete_duplicates(duplicate_files)
 
+        if output_file:
+            try:
+                with open(output_file, "w") as f:
+                    f.write("✔ Duplicate Files Found:")
+                    for file in duplicate_files:
+                        f.write(f"  -  {file}\n")
+                    f.close()
+                log(
+                    level="info",
+                    message=f"✔ Duplicate Results Written to Output File: {output_file}",
+                )
+                print(f"✔ Duplicate Results Written to Output File: {output_file}")
+            except (FileNotFoundError, PermissionError, OSError) as e:
+                log(
+                    level="error",
+                    message=f"✘ Could Not Write to Output File {output_file}: {e}",
+                    exc_info=True,
+                )
+                print(f"✘ Could Not Write to Output File {output_file}: {e}")
+
     except argparse.ArgumentError:
-        log(level="error", message="Argument Parsing Error.", exc_info=True)
-        print("Argument Parsing Error.")
+        log(level="error", message="✘ Invalid Argument Error.", exc_info=True)
+        print("✘ Invalid Argument Error.")
         parser.print_help()
         sys.exit(2)
-    except TypeError as e:
-        log(level="error", message=f"Type Error: {e}", exc_info=True)
-        print(f"Type Error: {e}")
-        sys.exit(1)
     except FileNotFoundError as e:
-        log(level="error", message=f"File Not Found: {e}", exc_info=True)
-        print(f"File Not Found: {e}")
+        log(level="error", message=f"✘ File Not Found: {e}", exc_info=True)
+        print(f"✘ File Not Found: {e}")
         sys.exit(1)
 
 
