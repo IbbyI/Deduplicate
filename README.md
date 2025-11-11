@@ -109,7 +109,6 @@ Scanning Path './test' For Duplicate Files...
 
 - ⛔ **Ignore Subdirectory** - Ignore specific paths from search.
 - 💬 **Verbose Flag** - Add verbose flag for easy debugging for users.
-- 🧪 **Unit Tests** - Add Unit Tests for features.
 
 ## 🧑‍💻 Author
 
