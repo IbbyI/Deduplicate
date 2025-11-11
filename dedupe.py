@@ -54,10 +54,17 @@ def main(argv: list[str]) -> None:
             help="Output File to Save Duplicate Results.",
         )
         parser.add_argument(
+            "-i",
+            "--ignore-path",
+            nargs=1,
+            type=str,
+            help="Ignore a Specific Path from Search & Comparison.",
+        )
+        parser.add_argument(
             "-v",
             "--version",
             action="version",
-            version="Deduplicate! 1.0.2",
+            version="Deduplicate! 1.1.0",
             help="Show Program Version.",
         )
 
@@ -68,6 +75,7 @@ def main(argv: list[str]) -> None:
             args.delete_duplicates if args.delete_duplicates else None
         )
         output_file = Path(args.output_file[0]) if args.output_file else None
+        ignore_path = Path(args.ignore_path[0]) if args.ignore_path else None
 
         if not start_path.exists():
             print("✘ Start Path Does Not Exist.")
@@ -78,7 +86,7 @@ def main(argv: list[str]) -> None:
             )
             sys.exit(2)
 
-        duplicate_group = find_duplicates(start_path)
+        duplicate_group = find_duplicates(start_path, ignore_path=ignore_path)
         if not duplicate_group:
             return
         duplicate_files = compare_files(duplicate_group)

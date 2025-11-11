@@ -6,7 +6,9 @@ from utils.log import log
 from utils.hash import hash_file
 
 
-def find_duplicates(start_path: Path) -> list[list[Path]] | None:
+def find_duplicates(
+    start_path: Path, ignore_path: Path | None
+) -> list[list[Path]] | None:
     """
     Find Duplicate Files in Given Path.
     Args:
@@ -17,10 +19,15 @@ def find_duplicates(start_path: Path) -> list[list[Path]] | None:
     """
     log(level="info", message=f"Scanning Path '{start_path}' For Duplicate Files...")
     print(f"Scanning Path '{start_path}' For Duplicate Files...")
+    if ignore_path:
+        log(level="info", message=f"Ignoring Path: {str(ignore_path)}")
+        print(f"Ignoring Path: {str(ignore_path)}")
 
     hashmap = {}
     for file in Path(start_path).rglob("*"):
         if file.is_file():
+            if ignore_path and file.is_relative_to(ignore_path):
+                continue
             hashed_file = hash_file(file)
             hashmap.setdefault(hashed_file, []).append(file)
 
