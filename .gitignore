@@ -4,3 +4,4 @@ test/
 *.txt
 *.log
 utils/__pycache__
+tests/__pycache__
