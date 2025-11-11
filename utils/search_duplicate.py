@@ -6,13 +6,14 @@ from utils.log import log
 from utils.hash import hash_file
 
 
-def find_duplicates(start_path: str) -> None:
+def find_duplicates(start_path: Path) -> list[list[Path]] | None:
     """
     Find Duplicate Files in Given Path.
     Args:
-        start_path (str): Path to Search for Duplicate Files.
+        start_path (Path): Path to Search for Duplicate Files.
     Returns:
-        list: List of Duplicate Files Found.
+        list[list[Path]]: Nested List of Path objects of duplicate files found.
+        None: If no duplicate files are found, returns None.
     """
     log(level="info", message=f"Scanning Path '{start_path}' For Duplicate Files...")
     print(f"Scanning Path '{start_path}' For Duplicate Files...")
@@ -31,7 +32,7 @@ def find_duplicates(start_path: str) -> None:
             level="info",
             message=f"✔ No Duplicates Found in Path: {start_path}\nTerminating Program...",
         )
-        return []
+        return
     for duplicates in duplicate_results:
         paths = [str(p) for p in duplicates]
         log(level="info", message=f"{' , '.join(paths)} are identical.")
@@ -40,13 +41,13 @@ def find_duplicates(start_path: str) -> None:
 
 def compare_files(
     duplicate_results: list[list[Path]],
-) -> list:
+) -> list[Path]:
     """
     Compare Duplicate Files and Select Newer One.
     Args:
         duplicate_results (list): List of nested arrays containing paths of duplicate files.
     Returns:
-        list: List of duplicate files, with the oldest file removed from each group.
+        list[Path]: List of duplicate files, with the oldest file removed from each group.
     """
     print("✔ Duplicate Files Found:")
     result = []
@@ -60,12 +61,12 @@ def compare_files(
     return result
 
 
-def move_duplicates(duplicate_files: list, move_path: str) -> None:
+def move_duplicates(duplicate_files: list[Path], move_path: Path) -> None:
     """
     Move Duplicate Files to Given Directory.
     Args:
-        duplicate_files (list): List of Duplicate Files Found.
-        move_path (str): Path to Move Duplicate Files to.
+        duplicate_files (list[Path]): List of Duplicate Files Found.
+        move_path (Path): Path to Move Duplicate Files to.
     """
     try:
         print(f"Moving Duplicate Files to {move_path}...")
