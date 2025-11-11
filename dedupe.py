@@ -80,7 +80,7 @@ def main(argv: list[str]) -> None:
 
         duplicate_group = find_duplicates(start_path)
         if not duplicate_group:
-            sys.exit()
+            return
         duplicate_files = compare_files(duplicate_group)
 
         log(
