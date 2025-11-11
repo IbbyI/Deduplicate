@@ -19,12 +19,12 @@ def main(argv: list[str]) -> None:
     Args:
         argv (list[str]): List of Command Line Arguments.
     """
+    parser = argparse.ArgumentParser(
+        prog="Deduplicate!",
+        description="Recursively check for duplicate files in a given directory.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     try:
-        parser = argparse.ArgumentParser(
-            prog="Deduplicate!",
-            description="Recursively check for duplicate files in a given directory.",
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        )
         parser.add_argument(
             "-p",
             "--path",
@@ -57,7 +57,7 @@ def main(argv: list[str]) -> None:
             "-v",
             "--version",
             action="version",
-            version="Deduplicate! 1.0.0",
+            version="Deduplicate! 1.0.2",
             help="Show Program Version.",
         )
 
@@ -79,6 +79,8 @@ def main(argv: list[str]) -> None:
             sys.exit(2)
 
         duplicate_group = find_duplicates(start_path)
+        if not duplicate_group:
+            sys.exit()
         duplicate_files = compare_files(duplicate_group)
 
         log(
