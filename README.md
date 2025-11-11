@@ -46,6 +46,7 @@ python dedupe.py -p <path> [-v] [-mv <destination>] [-del] [-o <destination>]
 | `-del` | `--delete-duplicates` | Delete all duplicate files after confirmation | `-del`             |
 | `-v`   | `--version`           | Program Version Number                        | `-v`               |
 | `-o`   | `--output-file`       | Path to save output file                      | `-o ./output.txt`  |
+| `-i`   | `--ignore-path`       | Path to Ignore Search & Comparison            | `-i ./cache/`      |
 
 ---
 
@@ -75,6 +76,12 @@ python dedupe.py -p ./Documents -mv ./Duplicates
 python dedupe.py -p ./test -del
 ```
 
+**Ignore directory from search**
+
+```
+python dedupe.py -p ./test -i ./test/cache/
+```
+
 **Get current version of program**
 
 ```
@@ -85,7 +92,7 @@ python dedupe.py -v
 
 ## 🧠 How It Works
 
-1. **Scan:** Deduplicate! recursively scans all files in the given directory.
+1. **Scan:** Deduplicate recursively scans all files in the given directory & optionally ignore specific directory.
 2. **Hash:** Each file’s contents are hashed using **SHA-256**, creating a unique signature.
 3. **Compare:** Files with identical hashes are grouped together.
 4. **Action:** You choose whether to **move** or **delete** duplicates.
@@ -96,11 +103,14 @@ python dedupe.py -v
 ## 📄 Example Output
 
 ```
+
 Scanning Path './test' For Duplicate Files...
 ✔ Duplicate Files Found:
- - ./test/subdir/a_copy.txt
-⚠ Are you sure you want to delete all duplicates? (Y/N): y
-✔ Duplicate Files Successfully Deleted.
+
+- ./test/subdir/a_copy.txt
+  ⚠ Are you sure you want to delete all duplicates? (Y/N): y
+  ✔ Duplicate Files Successfully Deleted.
+
 ```
 
 ---
