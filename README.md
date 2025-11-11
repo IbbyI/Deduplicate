@@ -34,7 +34,7 @@ It identifies identical files across nested folders and gives you the option to 
 ### 🔧 Command Syntax
 
 ```
-python dedupe.py -p <path> [-mv <destination>] [-del] [-o <destination>] [-v]
+python dedupe.py -p <path> [-v] [-mv <destination>] [-del] [-o <destination>]
 ```
 
 ### 🧩 Arguments
@@ -44,7 +44,7 @@ python dedupe.py -p <path> [-mv <destination>] [-del] [-o <destination>] [-v]
 | `-p`   | `--path`              | Path to search for duplicates                 | `-p ./Downloads`   |
 | `-mv`  | `--move-duplicates`   | Move duplicates to specified directory        | `-mv ./duplicates` |
 | `-del` | `--delete-duplicates` | Delete all duplicate files after confirmation | `-del`             |
-| `-v`   | `--version`           | Program Version Number                        | `v`                |
+| `-v`   | `--version`           | Program Version Number                        | `-v`               |
 | `-o`   | `--output-file`       | Path to save output file                      | `-o ./output.txt`  |
 
 ---
