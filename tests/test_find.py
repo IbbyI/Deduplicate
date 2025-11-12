@@ -15,7 +15,10 @@ class TestFileFunction(unittest.TestCase):
                     temp.write("Test Case.")
                     temp.flush()
 
-            self.assertTrue(type(find_duplicates(start_path=src_dir)), list[list[Path]])
+            self.assertTrue(
+                type(find_duplicates(start_path=src_dir, ignore_path=None)),
+                list[list[Path]],
+            )
             self.assertTrue(src_dir.exists())
 
         if src_dir.exists():
