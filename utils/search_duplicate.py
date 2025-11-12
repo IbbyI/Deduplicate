@@ -1,6 +1,8 @@
 import shutil
 from os import remove
 from pathlib import Path
+from rich import print as rprint
+from rich.prompt import Prompt
 
 from utils.log import log
 from utils.hash import hash_file
@@ -18,10 +20,10 @@ def find_duplicates(
         None: If no duplicate files are found, returns None.
     """
     log(level="info", message=f"Scanning Path '{start_path}' For Duplicate Files...")
-    print(f"Scanning Path '{start_path}' For Duplicate Files...")
+    rprint(f"[light_sky_blue1]Scanning Path '{start_path}' For Duplicate Files...[/]")
     if ignore_path:
         log(level="info", message=f"Ignoring Path: {str(ignore_path)}")
-        print(f"Ignoring Path: {str(ignore_path)}")
+        rprint(f"[blue]Ignoring Path: {str(ignore_path)}[/]")
 
     hashmap = {}
     for file in Path(start_path).rglob("*"):
@@ -34,7 +36,9 @@ def find_duplicates(
     duplicate_results = [value for value in hashmap.values() if len(value) > 1]
 
     if not duplicate_results:
-        print(f"✔ No Duplicates Found in Path: {start_path}\nTerminating Program...")
+        rprint(
+            f"✅ [bold underline green]No Duplicates Found in Path: {start_path}[/]\n[blue]Terminating Program...[/]"
+        )
         log(
             level="info",
             message=f"✔ No Duplicates Found in Path: {start_path}\nTerminating Program...",
@@ -56,7 +60,7 @@ def compare_files(
     Returns:
         list[Path]: List of duplicate files, with the oldest file removed from each group.
     """
-    print("✔ Duplicate Files Found:")
+    rprint("✅ [bold blue]Duplicate Files Found:[/]")
     result = []
     for group in duplicate_results:
         oldest_file = min(group, key=lambda f: f.stat().st_mtime)
@@ -64,7 +68,7 @@ def compare_files(
         result.extend(newer_files)
 
         for f in newer_files:
-            print(f" - {f}")
+            rprint(f"[grey54] - {f}[/]")
     return result
 
 
@@ -76,10 +80,10 @@ def move_duplicates(duplicate_files: list[Path], move_path: Path) -> None:
         move_path (Path): Path to Move Duplicate Files to.
     """
     try:
-        print(f"Moving Duplicate Files to {move_path}...")
+        rprint(f"[blue]Moving Duplicate Files to {move_path}...[/]")
 
         for f in duplicate_files:
-            print(f"Moving File: {f} to {move_path}")
+            rprint(f"[blue]Moving File: {f} to {move_path}[/]")
             shutil.move(f, move_path)
             log(level="info", message=f"Moved Newer File {f} to {move_path}")
     except (OSError, shutil.Error):
@@ -95,6 +99,7 @@ def delete_duplicates(duplicate_files: list) -> None:
         duplicate_files (list): List of Duplicate Files Found.
     """
     try:
+        rprint("[bold reverse red]⚠️ Deleting Duplicates...[/]")
         for f in duplicate_files:
             remove(f)
     except OSError:
@@ -115,11 +120,8 @@ def confirm_delete(duplicate_files: list) -> bool:
     Returns:
         bool: True if User Confirms Deletion, False Otherwise.
     """
-    for f in duplicate_files:
-        print(f" - {f}")
-    confirm = (
-        input("⚠ Are you sure you want to delete all duplicates? (Y/N): ")
-        .strip()
-        .lower()
-    )
+    confirm = Prompt.ask(
+        "[bold reverse red]⚠️ Are you sure you want to delete all duplicates? (Y/N): [/]",
+        case_sensitive=False,
+    ).strip()
     return confirm in ("y", "yes")

@@ -1,6 +1,7 @@
 import hashlib
 from sys import exit
 from pathlib import Path
+from rich import print as rprint
 
 from utils.log import log
 
@@ -25,7 +26,7 @@ def hash_file(path: Path) -> str:
             f.close()
         return sha256_hash.hexdigest()
     except Exception as e:
-        print(f"✘ Could Not Hash File {path}: {e}")
+        rprint(f"❌ [bold underline red]Could Not Hash File {path}: {e}[/]")
         log(
             level="error",
             message=f"✘ Could Not Hash File {path}: {e}",
