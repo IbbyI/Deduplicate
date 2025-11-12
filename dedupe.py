@@ -2,6 +2,7 @@ import sys
 import time
 import argparse
 from pathlib import Path
+from rich import print as rprint
 
 from utils.log import log
 from utils.search_duplicate import (
@@ -20,13 +21,22 @@ def main(argv: list[str]) -> None:
         argv (list[str]): List of Command Line Arguments.
     """
     parser = argparse.ArgumentParser(
-        prog="Deduplicate!",
+        prog="Deduplicate",
         description="Recursively check for duplicate files in a given directory.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     try:
         parser.add_argument(
+            "-v",
+            "-V",
+            "--version",
+            action="version",
+            version="Deduplicate 1.1.0",
+            help="Show Program Version.",
+        )
+        parser.add_argument(
             "-p",
+            "-P",
             "--path",
             type=str,
             nargs=1,
@@ -48,6 +58,7 @@ def main(argv: list[str]) -> None:
         )
         parser.add_argument(
             "-o",
+            "-O",
             "--output-file",
             nargs=1,
             type=str,
@@ -55,19 +66,12 @@ def main(argv: list[str]) -> None:
         )
         parser.add_argument(
             "-i",
+            "-I",
             "--ignore-path",
             nargs=1,
             type=str,
             help="Ignore a Specific Path from Search & Comparison.",
         )
-        parser.add_argument(
-            "-v",
-            "--version",
-            action="version",
-            version="Deduplicate! 1.1.0",
-            help="Show Program Version.",
-        )
-
         args = parser.parse_args()
         start_path = Path(args.path[0])
         duplicate_path = Path(args.move_duplicates[0]) if args.move_duplicates else None
@@ -78,7 +82,7 @@ def main(argv: list[str]) -> None:
         ignore_path = Path(args.ignore_path[0]) if args.ignore_path else None
 
         if not start_path.exists():
-            print("✘ Start Path Does Not Exist.")
+            rprint("❌ [bold underline red]Start Path Does Not Exist.[/]")
             log(
                 level="error",
                 message="✘ Start Path Does Not Exist.",
@@ -118,23 +122,27 @@ def main(argv: list[str]) -> None:
                     level="info",
                     message=f"✔ Duplicate Results Written to Output File: {output_file}",
                 )
-                print(f"✔ Duplicate Results Written to Output File: {output_file}")
+                rprint(
+                    f"✅ [bold underline green]Duplicate Results Written to Output File: {output_file}[/]"
+                )
             except (FileNotFoundError, PermissionError, OSError) as e:
                 log(
                     level="error",
                     message=f"✘ Could Not Write to Output File {output_file}: {e}",
                     exc_info=True,
                 )
-                print(f"✘ Could Not Write to Output File {output_file}: {e}")
+                rprint(
+                    f"❌ [bold underline red]Could Not Write to Output File {output_file}: {e}[/]"
+                )
 
     except argparse.ArgumentError:
         log(level="error", message="✘ Invalid Argument Error.", exc_info=True)
-        print("✘ Invalid Argument Error.")
+        rprint("❌ [bold underline red]Invalid Argument Error.[/]")
         parser.print_help()
         sys.exit(2)
     except FileNotFoundError as e:
         log(level="error", message=f"✘ File Not Found: {e}", exc_info=True)
-        print(f"✘ File Not Found: {e}")
+        rprint(f"❌ [bold underline red]File Not Found: {e}[/]")
         sys.exit(1)
 
 
@@ -144,4 +152,4 @@ if __name__ == "__main__":
     main(sys.argv[1:])
     time_taken = time.time() - start_time
     log(level="info", message=f"Time Taken: {"%.2f" % time_taken}s")
-    print(f"Time Taken: {'%.2f' % time_taken}s")
+    rprint(f"[bold underline blue]Time Taken: {'%.2f' % time_taken}s[/]")
