@@ -31,7 +31,7 @@ def main(argv: list[str]) -> None:
             "-V",
             "--version",
             action="version",
-            version="Deduplicate 1.1.0",
+            version="Deduplicate 1.1.5",
             help="Show Program Version.",
         )
         parser.add_argument(
@@ -72,6 +72,12 @@ def main(argv: list[str]) -> None:
             type=str,
             help="Ignore a Specific Path from Search & Comparison.",
         )
+        parser.add_argument(
+            "-kn",
+            "--keep-newest",
+            action="store_true",
+            help="Keeps the Newest Copy & Marks Older Files as Duplicates",
+        )
         args = parser.parse_args()
         start_path = Path(args.path[0])
         duplicate_path = Path(args.move_duplicates[0]) if args.move_duplicates else None
@@ -80,6 +86,7 @@ def main(argv: list[str]) -> None:
         )
         output_file = Path(args.output_file[0]) if args.output_file else None
         ignore_path = Path(args.ignore_path[0]) if args.ignore_path else None
+        keep_newest_file = True if args.keep_newest else False
 
         if not start_path.exists():
             rprint("❌ [bold underline red]Start Path Does Not Exist.[/]")
@@ -93,7 +100,7 @@ def main(argv: list[str]) -> None:
         duplicate_group = find_duplicates(start_path, ignore_path=ignore_path)
         if not duplicate_group:
             return
-        duplicate_files = compare_files(duplicate_group)
+        duplicate_files = compare_files(duplicate_group, keep_newest_file)
 
         log(
             level="info",

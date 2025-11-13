@@ -57,7 +57,7 @@ def find_duplicates(
 
 
 def compare_files(
-    duplicate_results: list[list[Path]],
+    duplicate_results: list[list[Path]], keep_newest_file: bool = False
 ) -> list[Path]:
     """
     Compare Duplicate Files and Select Newer One.
@@ -70,7 +70,12 @@ def compare_files(
     result = []
     try:
         for group in duplicate_results:
-            keep_file = min(group, key=lambda f: f.stat().st_mtime)
+            if keep_newest_file:
+                keep_file = max(group, key=lambda f: f.stat().st_mtime)
+            else:
+                keep_file = min(group, key=lambda f: f.stat().st_mtime)
+            log(level="info", message=f"Setting file {keep_file} as original.")
+
             newer_files = [f for f in group if f != keep_file]
             result.extend(newer_files)
             for f in newer_files:
