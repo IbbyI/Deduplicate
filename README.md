@@ -52,6 +52,7 @@ python dedupe.py -p <path> [-v] [-mv <destination>] [-del] [-o <destination>]
 | `-v`   | `--version`           | Program Version Number                        | `-v`               |
 | `-o`   | `--output-file`       | Path to save output file                      | `-o ./output.txt`  |
 | `-i`   | `--ignore-path`       | Path to Ignore Search & Comparison            | `-i ./cache/`      |
+| `-kn`  | `--keep-newest`       | Option to Keep the Newest File                | `-kn`              |
 
 ---
 
