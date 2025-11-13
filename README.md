@@ -25,7 +25,12 @@ It identifies identical files across nested folders and gives you the option to 
 ## 🧰 Requirements
 
 - Python 3.8+
-- No external dependencies.
+
+Install Required Packages via:
+
+```
+python -m pip install -r requirements.txt
+```
 
 ---
 
@@ -105,12 +110,10 @@ python dedupe.py -v
 ```
 
 Scanning Path './test' For Duplicate Files...
-✔ Duplicate Files Found:
-
+✅ Duplicate Files Found:
 - ./test/subdir/a_copy.txt
-  ⚠ Are you sure you want to delete all duplicates? (Y/N): y
-  ✔ Duplicate Files Successfully Deleted.
-
+  ⚠️ Are you sure you want to delete all duplicates? (Y/N): y
+  ✅ Duplicate Files Successfully Deleted.
 ```
 
 ---
@@ -118,6 +121,7 @@ Scanning Path './test' For Duplicate Files...
 ## 🎯 Upcoming Features
 
 - 💬 **Verbose Flag** - Add verbose flag for easy debugging for users.
+- ⏳ **Scaling** - Instead of reading all hashes, implement chunk traversal/lazy hashing.
 
 ## 🧑‍💻 Author
 
