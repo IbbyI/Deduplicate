@@ -112,28 +112,7 @@ def main(argv: list[str]) -> None:
                 delete_duplicates(duplicate_files)
 
         if output_file:
-            try:
-                with open(output_file, "w") as f:
-                    f.write("✔ Duplicate Files Found:")
-                    for file in duplicate_files:
-                        f.write(f"  -  {file}\n")
-                    f.close()
-                log(
-                    level="info",
-                    message=f"✔ Duplicate Results Written to Output File: {output_file}",
-                )
-                rprint(
-                    f"✅ [bold underline green]Duplicate Results Written to Output File: {output_file}[/]"
-                )
-            except (FileNotFoundError, PermissionError, OSError) as e:
-                log(
-                    level="error",
-                    message=f"✘ Could Not Write to Output File {output_file}: {e}",
-                    exc_info=True,
-                )
-                rprint(
-                    f"❌ [bold underline red]Could Not Write to Output File {output_file}: {e}[/]"
-                )
+            write_to_output(duplicate_files=duplicate_files, output_file=output_file)
 
     except argparse.ArgumentError:
         log(level="error", message="✘ Invalid Argument Error.", exc_info=True)
@@ -144,6 +123,31 @@ def main(argv: list[str]) -> None:
         log(level="error", message=f"✘ File Not Found: {e}", exc_info=True)
         rprint(f"❌ [bold underline red]File Not Found: {e}[/]")
         sys.exit(1)
+
+
+def write_to_output(duplicate_files: list[Path], output_file: Path) -> None:
+    try:
+        with open(output_file, "w") as f:
+            f.write("✔ Duplicate Files Found:\n")
+            for file in duplicate_files:
+                f.write(f"  -  {file}\n")
+            f.close()
+        log(
+            level="info",
+            message=f"✔ Duplicate Results Written to Output File: {output_file}",
+        )
+        rprint(
+            f"✅ [bold underline green]Duplicate Results Written to Output File: {output_file}[/]"
+        )
+    except (FileNotFoundError, PermissionError, OSError) as e:
+        log(
+            level="error",
+            message=f"✘ Could Not Write to Output File {output_file}: {e}",
+            exc_info=True,
+        )
+        rprint(
+            f"❌ [bold underline red]Could Not Write to Output File {output_file}: {e}[/]"
+        )
 
 
 if __name__ == "__main__":
