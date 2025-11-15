@@ -29,7 +29,39 @@ def hash_file(path: Path) -> str:
         rprint(f"❌ [bold underline red]Could Not Hash File {path}: {e}[/]")
         log(
             level="error",
-            message=f"✘ Could Not Hash File {path}: {e}",
+            message=f"❌ Could Not Hash File {path}: {e}",
+            exc_info=True,
+        )
+        exit(1)
+
+
+def fast_hash_file(path: Path) -> str:
+    """
+    Compute 4KB Chunks from Start and End of file using SHA-256 Hash of File Contents.
+    Args:
+        path (Path): Path to the file to hash
+    Returns:
+        str: SHA-256 Hash of Sampled File Contents
+    """
+    if path.is_dir():
+        raise ValueError(f"Cannot hash a directory: {path}")
+
+    try:
+        log(level="info", message=f"Fast Hashing Contents from File {path}.")
+        sha256_hash = hashlib.sha256()
+        file_size = path.stat().st_size
+        with open(path, "rb") as f:
+            sha256_hash.update(f.read(4096))
+            if file_size > 4096:
+                f.seek(-4096, 2)
+                sha256_hash.update(f.read(4096))
+            f.close()
+        return sha256_hash.hexdigest()
+    except Exception as e:
+        rprint(f"❌ [bold underline red]Could Not Fast Hash File {path}: {e}[/]")
+        log(
+            level="error",
+            message=f"❌ Could Not Fast Hash File {path}: {e}",
             exc_info=True,
         )
         exit(1)
