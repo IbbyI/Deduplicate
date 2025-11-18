@@ -6,7 +6,7 @@ from rich import print as rprint
 from utils.log import log
 
 
-def hash_file(path: Path) -> str:
+def full_hash(path: Path) -> str:
     """
     Compute SHA-256 Hash of File Contents in 4KB Chunks.
     Args:
@@ -35,7 +35,7 @@ def hash_file(path: Path) -> str:
         exit(1)
 
 
-def fast_hash_file(path: Path) -> str:
+def fast_chunk_hash(path: Path) -> str:
     """
     Compute 4KB Chunks from Start and End of file using SHA-256 Hash of File Contents.
     Args:
