@@ -5,6 +5,7 @@ from pathlib import Path
 from rich import print as rprint
 
 from utils.log import log
+from utils.hash import full_hash, fast_chunk_hash
 from utils.search_duplicate import (
     find_duplicates,
     move_duplicates,
@@ -27,12 +28,19 @@ def main(argv: list[str]) -> None:
     )
     try:
         parser.add_argument(
-            "-v",
-            "-V",
+            "-ver",
+            "-VER",
             "--version",
             action="version",
-            version="Deduplicate 1.1.5",
+            version="Deduplicate 1.1.8",
             help="Show Program Version.",
+        )
+        parser.add_argument(
+            "-vv",
+            "-VV",
+            "--verbose",
+            action="store_true",
+            help="Print Detailed Output For Debugging",
         )
         parser.add_argument(
             "-p",
@@ -78,15 +86,23 @@ def main(argv: list[str]) -> None:
             action="store_true",
             help="Keeps the Newest Copy & Marks Older Files as Duplicates",
         )
+        parser.add_argument(
+            "-f",
+            "-F",
+            "--full",
+            action="store_true",
+            help="Longer but More Accurate Check for Duplicates",
+        )
         args = parser.parse_args()
         start_path = Path(args.path[0])
         duplicate_path = Path(args.move_duplicates[0]) if args.move_duplicates else None
-        delete_duplicates_flag = (
-            args.delete_duplicates if args.delete_duplicates else None
-        )
         output_file = Path(args.output_file[0]) if args.output_file else None
         ignore_path = Path(args.ignore_path[0]) if args.ignore_path else None
+
         keep_newest_file = True if args.keep_newest else False
+        verbose_flag = True if args.verbose else False
+        delete_duplicates_flag = True if args.delete_duplicates else False
+        hash_method = full_hash if args.full else fast_chunk_hash
 
         if not start_path.exists():
             rprint("❌ [bold underline red]Start Path Does Not Exist.[/]")
@@ -97,7 +113,9 @@ def main(argv: list[str]) -> None:
             )
             sys.exit(2)
 
-        duplicate_group = find_duplicates(start_path, ignore_path=ignore_path)
+        duplicate_group = find_duplicates(
+            start_path, ignore_path=ignore_path, hash_func=hash_method
+        )
         if not duplicate_group:
             return
         duplicate_files = compare_files(duplicate_group, keep_newest_file)
