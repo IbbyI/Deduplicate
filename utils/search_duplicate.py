@@ -6,10 +6,12 @@ from rich.prompt import Prompt
 from rich.progress import Progress
 
 from utils.log import log
+from utils.verbose import verbose
 
 progress = Progress()
 
 
+@verbose("Scanning For Duplicates")
 def find_duplicates(
     start_path: Path,
     ignore_path: Path | None,
@@ -57,6 +59,7 @@ def find_duplicates(
         progress.stop()
 
 
+@verbose("Comparing Duplicates")
 def compare_files(
     duplicate_results: list[list[Path]], keep_newest_file: bool = False
 ) -> list[Path]:
@@ -67,7 +70,6 @@ def compare_files(
     Returns:
         list[Path]: List of duplicate files, with the oldest file removed from each group.
     """
-    rprint("✅ [bold blue]Duplicate Files Found:[/]")
     result = []
     try:
         for group in duplicate_results:
@@ -80,17 +82,20 @@ def compare_files(
             newer_files = [f for f in group if f != keep_file]
             result.extend(newer_files)
         number_of_duplicates = len(result)
+        rprint(f"✅ [bold green]{number_of_duplicates} Duplicate Files Found:[/]")
         if number_of_duplicates > 30:
             ask_print = Prompt.ask(
-                f"[bold blue]{number_of_duplicates} Duplicates Found. Would You Like To Print the Paths of All Duplicates To Console? (Y/N)[/]"
+                f"[bold blue underline]Printing Files to Console Would You Like To Print the Paths of All Duplicates To Console? (Y/N)[/]"
             ).lower()
+            ask_print = "n"
             if ask_print in ("yes", "y"):
                 for f in result:
-                    rprint(f"[grey54] - {f}[/]")
+                    rprint(f"[grey54] -n {f}[/]")
     finally:
         return result
 
 
+@verbose("Moving Duplicates")
 def move_duplicates(duplicate_files: list[Path], move_path: Path) -> None:
     """
     Move Duplicate Files to Given Directory.
@@ -116,6 +121,7 @@ def move_duplicates(duplicate_files: list[Path], move_path: Path) -> None:
         progress.stop()
 
 
+@verbose("Deleting Duplicates")
 def delete_duplicates(duplicate_files: list) -> None:
     """
     Delete Duplicate Files.
