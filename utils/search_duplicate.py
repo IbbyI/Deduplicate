@@ -6,13 +6,14 @@ from rich.prompt import Prompt
 from rich.progress import Progress
 
 from utils.log import log
-from utils.hash import hash_file
 
 progress = Progress()
 
 
 def find_duplicates(
-    start_path: Path, ignore_path: Path | None
+    start_path: Path,
+    ignore_path: Path | None,
+    hash_func: any,
 ) -> list[list[Path]] | None:
     """
     Find Duplicate Files in Given Path.
@@ -36,7 +37,7 @@ def find_duplicates(
                 if ignore_path and file.is_relative_to(ignore_path):
                     progress.update(hash_task)
                     continue
-                hashed_file = hash_file(file)
+                hashed_file = hash_func(file)
                 hashmap.setdefault(hashed_file, []).append(file)
         duplicate_results = [value for value in hashmap.values() if len(value) > 1]
         if not duplicate_results:
@@ -78,8 +79,14 @@ def compare_files(
 
             newer_files = [f for f in group if f != keep_file]
             result.extend(newer_files)
-            for f in newer_files:
-                rprint(f"[grey54] - {f}[/]")
+        number_of_duplicates = len(result)
+        if number_of_duplicates > 30:
+            ask_print = Prompt.ask(
+                f"[bold blue]{number_of_duplicates} Duplicates Found. Would You Like To Print the Paths of All Duplicates To Console? (Y/N)[/]"
+            ).lower()
+            if ask_print in ("yes", "y"):
+                for f in result:
+                    rprint(f"[grey54] - {f}[/]")
     finally:
         return result
 
@@ -136,7 +143,7 @@ def delete_duplicates(duplicate_files: list) -> None:
         progress.stop()
 
 
-def confirm_delete(duplicate_files: list) -> bool:
+def confirm_delete() -> bool:
     """
     Confirm Deletion of Duplicate Files from User.
     Args:
