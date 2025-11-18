@@ -5,7 +5,8 @@ from pathlib import Path
 from rich import print as rprint
 
 from utils.log import log
-from utils.hash import full_hash, fast_chunk_hash
+from utils.hash import full_hash, quick_hash, auto_hash
+from utils.verbose import set_verbose
 from utils.search_duplicate import (
     find_duplicates,
     move_duplicates,
@@ -93,6 +94,13 @@ def main(argv: list[str]) -> None:
             action="store_true",
             help="Longer but More Accurate Check for Duplicates",
         )
+        parser.add_argument(
+            "-q",
+            "-Q",
+            "--quick",
+            action="store_true",
+            help="Quick but Less Accurate Check for Duplicates",
+        )
         args = parser.parse_args()
         start_path = Path(args.path[0])
         duplicate_path = Path(args.move_duplicates[0]) if args.move_duplicates else None
@@ -100,9 +108,17 @@ def main(argv: list[str]) -> None:
         ignore_path = Path(args.ignore_path[0]) if args.ignore_path else None
 
         keep_newest_file = True if args.keep_newest else False
-        verbose_flag = True if args.verbose else False
         delete_duplicates_flag = True if args.delete_duplicates else False
-        hash_method = full_hash if args.full else fast_chunk_hash
+
+        if args.verbose:
+            set_verbose(True)
+
+        if args.full:
+            hash_method = full_hash
+        elif args.quick:
+            hash_method = quick_hash
+        else:
+            hash_method = auto_hash
 
         if not start_path.exists():
             rprint("❌ [bold underline red]Start Path Does Not Exist.[/]")
@@ -156,7 +172,6 @@ def write_to_output(duplicate_files: list[Path], output_file: Path) -> None:
             f.write("✔ Duplicate Files Found:\n")
             for file in duplicate_files:
                 f.write(f"  -  {file}\n")
-            f.close()
         log(
             level="info",
             message=f"✔ Duplicate Results Written to Output File: {output_file}",
