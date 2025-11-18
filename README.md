@@ -46,13 +46,16 @@ python dedupe.py -p <path> [-v] [-mv <destination>] [-del] [-o <destination>]
 
 | Flag   | Long Form             | Description                                   | Example            |
 | ------ | --------------------- | --------------------------------------------- | ------------------ |
-| `-p`   | `--path`              | Path to search for duplicates                 | `-p ./Downloads`   |
+| `-v`   | `--version`           | Program Version Number                        | `-v`               |
+| `-vv`  | `--verbose`           | Detailed Output for Debugging                 | `-vv`               |
+|  `-p`  | `--path`              | Path to search for duplicates                 | `-p ./Downloads`   |
 | `-mv`  | `--move-duplicates`   | Move duplicates to specified directory        | `-mv ./duplicates` |
 | `-del` | `--delete-duplicates` | Delete all duplicate files after confirmation | `-del`             |
-| `-v`   | `--version`           | Program Version Number                        | `-v`               |
 | `-o`   | `--output-file`       | Path to save output file                      | `-o ./output.txt`  |
 | `-i`   | `--ignore-path`       | Path to Ignore Search & Comparison            | `-i ./cache/`      |
 | `-kn`  | `--keep-newest`       | Option to Keep the Newest File                | `-kn`              |
+| `-f`   | `--full`              | More Accurate Duplicate Check                 | `-f`               |
+| `-q`   | `--quick`             | Less Accurate Duplicate Check                 | `-q`               |
 
 ---
 
