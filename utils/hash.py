@@ -4,13 +4,15 @@ from pathlib import Path
 from rich import print as rprint
 
 from utils.log import log
+from utils.verbose import verbose
 
 
+@verbose("Full Hashing File")
 def full_hash(path: Path) -> str:
     """
-    Compute SHA-256 Hash of File Contents in 4KB Chunks.
+    Compute SHA-256 Hash of Entire Contents of File in 4KB Chunks.
     Args:
-        path (Path): Path to the file to hash
+        path (Path): Path to the File to Hash
     Returns:
         str: SHA-256 Hash of File Contents
     """
@@ -23,7 +25,6 @@ def full_hash(path: Path) -> str:
         with open(path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
                 sha256_hash.update(chunk)
-            f.close()
         return sha256_hash.hexdigest()
     except Exception as e:
         rprint(f"❌ [bold underline red]Could Not Hash File {path}: {e}[/]")
@@ -35,11 +36,12 @@ def full_hash(path: Path) -> str:
         exit(1)
 
 
-def fast_chunk_hash(path: Path) -> str:
+@verbose("Quick Hashing File")
+def quick_hash(path: Path) -> str:
     """
     Compute 4KB Chunks from Start and End of file using SHA-256 Hash of File Contents.
     Args:
-        path (Path): Path to the file to hash
+        path (Path): Path to the File to Hash
     Returns:
         str: SHA-256 Hash of Sampled File Contents
     """
@@ -55,7 +57,6 @@ def fast_chunk_hash(path: Path) -> str:
             if file_size > 4096:
                 f.seek(-4096, 2)
                 sha256_hash.update(f.read(4096))
-            f.close()
         return sha256_hash.hexdigest()
     except Exception as e:
         rprint(f"❌ [bold underline red]Could Not Fast Hash File {path}: {e}[/]")
@@ -65,3 +66,18 @@ def fast_chunk_hash(path: Path) -> str:
             exc_info=True,
         )
         exit(1)
+
+
+@verbose("Auto Hashing File")
+def auto_hash(path: Path) -> str:
+    """
+    Compute SHA-256 Hash of File Contents Based on File Size.
+    If The File > 2MB, It Fast Hashes the File, Else Slow Hash.
+        Args:
+        path (Path): Path o the file to hash
+    Returns:
+        str: SHA-256 Hash of File Contents or Sample of File.
+    """
+    if path.stat().st_size <= 2 * 1024 * 1024:
+        return full_hash(path)
+    return quick_hash(path)
