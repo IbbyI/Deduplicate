@@ -33,7 +33,6 @@ def full_hash(path: Path) -> str:
             message=f"❌ Could Not Hash File {path}: {e}",
             exc_info=True,
         )
-        exit(1)
 
 
 @verbose("Quick Hashing File")
@@ -65,7 +64,6 @@ def quick_hash(path: Path) -> str:
             message=f"❌ Could Not Fast Hash File {path}: {e}",
             exc_info=True,
         )
-        exit(1)
 
 
 @verbose("Auto Hashing File")
