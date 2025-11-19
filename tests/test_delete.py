@@ -2,7 +2,7 @@ import unittest
 import tempfile
 
 from pathlib import Path
-from utils.search_duplicate import delete_duplicates
+from utils.actions import delete_duplicates
 
 
 class TestDeleteFunction(unittest.TestCase):

@@ -1,8 +1,9 @@
 import unittest
 import tempfile
 from pathlib import Path
-from utils.search_duplicate import find_duplicates
-from utils.hash import auto_hash
+
+from utils.scanner import find_duplicates
+from utils.hasher import auto_hash
 
 
 class TestFileFunction(unittest.TestCase):
@@ -17,7 +18,11 @@ class TestFileFunction(unittest.TestCase):
                     temp.flush()
 
             self.assertTrue(
-                type(find_duplicates(start_path=src_dir, ignore_path=None, hash_func=auto_hash)),
+                type(
+                    find_duplicates(
+                        start_path=src_dir, ignore_path=None, hash_func=auto_hash
+                    )
+                ),
                 list[list[Path]],
             )
             self.assertTrue(src_dir.exists())
