@@ -124,9 +124,9 @@ Scanning Path './test' For Duplicate Files...
 
 ## 🎯 Upcoming Features
 
-- 💬 **Verbose Flag** - Add verbose flag for easy debugging for users.
-- ⏳ **Scaling** - Avoid hashing and storing every file, process duplicates as soon as they're found.
-- ↪️ **Avoid Filetypes** - Avoid certain filetypes with the option to change/customize via a .env file.
+- **Export Options** Option to Export Duplicates as .json File or SQLite Database.
+- **Updated Unit Tests** Add Unit Tests for All Available Features.
+- **Dry Run** Add Dry Run Option For a Safe Run Before Deletion/Move.
 
 ## 🧑‍💻 Author
 
