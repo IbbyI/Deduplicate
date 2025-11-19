@@ -5,15 +5,11 @@ from pathlib import Path
 from rich import print as rprint
 
 from utils.log import log
-from utils.hash import full_hash, quick_hash, auto_hash
+from utils.hasher import full_hash, quick_hash, auto_hash
 from utils.verbose import set_verbose
-from utils.search_duplicate import (
-    find_duplicates,
-    move_duplicates,
-    compare_files,
-    delete_duplicates,
-    confirm_delete,
-)
+from utils.actions import move_duplicates, delete_duplicates
+from utils.comperator import compare_files
+from utils.scanner import find_duplicates
 
 
 def main(argv: list[str]) -> None:
@@ -33,7 +29,7 @@ def main(argv: list[str]) -> None:
             "-VER",
             "--version",
             action="version",
-            version="Deduplicate 1.1.8",
+            version="Deduplicate 1.1.9",
             help="Show Program Version.",
         )
         parser.add_argument(
