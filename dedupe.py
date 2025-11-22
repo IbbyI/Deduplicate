@@ -97,6 +97,11 @@ def main(argv: list[str]) -> None:
             action="store_true",
             help="Quick but Less Accurate Check for Duplicates",
         )
+        parser.add_argument(
+            "--dry-run",
+            action="store_true",
+            help="Dry Run for Testing Moving & Deletion",
+        )
         args = parser.parse_args()
         start_path = Path(args.path[0])
         duplicate_path = Path(args.move_duplicates[0]) if args.move_duplicates else None
@@ -105,9 +110,18 @@ def main(argv: list[str]) -> None:
 
         keep_newest_file = True if args.keep_newest else False
         delete_duplicates_flag = True if args.delete_duplicates else False
+        dry_run_flag = True if args.dry_run else False
+
+        if dry_run_flag and not (delete_duplicates_flag or duplicate_path):
+            rprint(
+                "❌ [bold underline red]Dry Run Requires Either Moving or Deletion Flag.[/]"
+            )
+            sys.exit(1)
 
         if args.verbose:
             set_verbose(True)
+        else:
+            set_verbose(False)
 
         if args.full:
             hash_method = full_hash
@@ -141,11 +155,11 @@ def main(argv: list[str]) -> None:
             if not duplicate_path.exists():
                 Path.mkdir(duplicate_path)
                 log(level="info", message=f"Directory Created at: {duplicate_path}")
-            move_duplicates(duplicate_files, duplicate_path)
+            move_duplicates(duplicate_files, duplicate_path, dry_run_flag)
 
         if delete_duplicates_flag:
-           if confirm_delete():
-                delete_duplicates(duplicate_files)
+            if confirm_delete():
+                delete_duplicates(duplicate_files, dry_run_flag)
 
         if output_file:
             write_to_output(duplicate_files=duplicate_files, output_file=output_file)
@@ -162,6 +176,12 @@ def main(argv: list[str]) -> None:
 
 
 def write_to_output(duplicate_files: list[Path], output_file: Path) -> None:
+    """
+    Write Results to Output File.
+    Args:
+        duplicate_files (list[Path]): List of Duplicate Files Found.
+        output_file (Path): Path of Output File to Write To.
+    """
     try:
         with open(output_file, "w") as f:
             f.write("✔ Duplicate Files Found:\n")
