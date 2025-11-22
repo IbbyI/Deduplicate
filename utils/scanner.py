@@ -9,7 +9,7 @@ from utils.verbose import verbose
 progress = Progress()
 
 
-@verbose("Scanning For Duplicates")
+@verbose(lambda groups: f"Duplicate groups: {len(groups or [])}")
 def find_duplicates(
     start_path: Path,
     ignore_path: Path | None,

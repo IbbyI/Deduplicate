@@ -17,7 +17,9 @@ class TestMoveFunction(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             dest_dir = Path(tmpdir)
 
-            move_duplicates(duplicate_files=[src_file], move_path=dest_dir)
+            move_duplicates(
+                duplicate_files=[src_file], move_path=dest_dir, dry_run_flag=False
+            )
 
             dest = dest_dir / src_file.name
 

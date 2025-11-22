@@ -28,7 +28,7 @@ class TestHashFunction(unittest.TestCase):
         ) as temp:
             temp.write(str(urandom(8500)))
             temp.flush()
-        
+
         quick_hash_results = quick_hash(Path(temp.name)).strip()
         full_hash_results = full_hash(Path(temp.name)).strip()
 

@@ -15,7 +15,7 @@ class TestDeleteFunction(unittest.TestCase):
             src_file = Path(temp.name)
 
         try:
-            delete_duplicates(duplicate_files=[src_file])
+            delete_duplicates(duplicate_files=[src_file], dry_run_flag=False)
             self.assertFalse(src_file.exists())
 
         finally:
