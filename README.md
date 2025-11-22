@@ -125,8 +125,6 @@ Scanning Path './test' For Duplicate Files...
 ## 🎯 Upcoming Features
 
 - **Export Options** Option to Export Duplicates as .json File or SQLite Database.
-- **Updated Unit Tests** Add Unit Tests for All Available Features.
-- **Dry Run** Add Dry Run Option For a Safe Run Before Deletion/Move.
 
 ## 🧑‍💻 Author
 
