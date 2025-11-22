@@ -32,14 +32,14 @@ def compare_files(
             newer_files = [f for f in group if f != keep_file]
             result.extend(newer_files)
         number_of_duplicates = len(result)
-        rprint(f"✅ [bold green]{number_of_duplicates} Duplicate Files Found:[/]")
+        rprint(f"✅ [bold green underline]{number_of_duplicates} Duplicate Files Found:[/]")
         if number_of_duplicates > 30:
             ask_print = Prompt.ask(
-                f"[bold blue underline]Printing Files to Console Would You Like To Print the Paths of All Duplicates To Console? (Y/N)[/]"
+                f"[bold blue]Would You Like To Print the Paths of All Duplicates To Console? (Y/N)[/]"
             ).lower()
-            ask_print = "n"
-            if ask_print in ("yes", "y"):
-                for f in result:
-                    rprint(f"[grey54] -n {f}[/]")
+            if ask_print not in ("yes", "y"):
+                return result
+        for f in result:
+            rprint(f"[grey54] -n {f}[/]")
     finally:
         return result

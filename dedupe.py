@@ -7,7 +7,7 @@ from rich import print as rprint
 from utils.log import log
 from utils.hasher import full_hash, quick_hash, auto_hash
 from utils.verbose import set_verbose
-from utils.actions import move_duplicates, delete_duplicates
+from utils.actions import move_duplicates, delete_duplicates, confirm_delete
 from utils.comperator import compare_files
 from utils.scanner import find_duplicates
 
@@ -144,8 +144,7 @@ def main(argv: list[str]) -> None:
             move_duplicates(duplicate_files, duplicate_path)
 
         if delete_duplicates_flag:
-            confirm = confirm_delete(duplicate_files)
-            if confirm:
+           if confirm_delete():
                 delete_duplicates(duplicate_files)
 
         if output_file:
