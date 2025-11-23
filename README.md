@@ -47,7 +47,7 @@ python dedupe.py -p <path> [-v] [-mv <destination>] [-del] [-o <destination>]
 | Flag   | Long Form             | Description                                   | Example            |
 | ------ | --------------------- | --------------------------------------------- | ------------------ |
 | `-v`   | `--version`           | Program Version Number                        | `-v`               |
-| `-vv`  | `--verbose`           | Detailed Output for Debugging                 | `-vv`               |
+| `-vv`  | `--verbose`           | Detailed Output for Debugging                 | `-vv`              |
 |  `-p`  | `--path`              | Path to search for duplicates                 | `-p ./Downloads`   |
 | `-mv`  | `--move-duplicates`   | Move duplicates to specified directory        | `-mv ./duplicates` |
 | `-del` | `--delete-duplicates` | Delete all duplicate files after confirmation | `-del`             |
@@ -56,7 +56,7 @@ python dedupe.py -p <path> [-v] [-mv <destination>] [-del] [-o <destination>]
 | `-kn`  | `--keep-newest`       | Option to Keep the Newest File                | `-kn`              |
 | `-f`   | `--full`              | More Accurate Duplicate Check                 | `-f`               |
 | `-q`   | `--quick`             | Less Accurate Duplicate Check                 | `-q`               |
-
+| `N/A`   | `--dry-run`           | Tests Run Move and Delete Functionality       | `--dry-run`       |
 ---
 
 ### 💻 Examples
@@ -125,6 +125,12 @@ Scanning Path './test' For Duplicate Files...
 ## 🎯 Upcoming Features
 
 - **Export Options** Option to Export Duplicates as .json File or SQLite Database.
+- **Reformat** Split Logic Functions from UI
+- **Improve Unit Tests** Improve Unit Tests for Logic Only Tests & Test More Features
+- **Help Text** Help Text is Currently Cluttered. ALlow No Arguments for -p
+- **Tiered Hashing** Add Tiered Hashing if Collisions Occur
+- **Simplify UI** Make UI More User Friendly
+- **Improve Structure** Fix Project Structure so its PyPI Package-Ready
 
 ## 🧑‍💻 Author
 
