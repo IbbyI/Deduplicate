@@ -9,7 +9,7 @@ from utils.verbose import verbose
 progress = Progress()
 
 
-@verbose("Comparing Duplicates")
+@verbose(lambda result: f"Found {len(result)} duplicate files")
 def compare_files(
     duplicate_results: list[list[Path]], keep_newest_file: bool = False
 ) -> list[Path]:
@@ -32,7 +32,9 @@ def compare_files(
             newer_files = [f for f in group if f != keep_file]
             result.extend(newer_files)
         number_of_duplicates = len(result)
-        rprint(f"✅ [bold green underline]{number_of_duplicates} Duplicate Files Found:[/]")
+        rprint(
+            f"✅ [bold green underline]{number_of_duplicates} Duplicate Files Found:[/]"
+        )
         if number_of_duplicates > 30:
             ask_print = Prompt.ask(
                 f"[bold blue]Would You Like To Print the Paths of All Duplicates To Console? (Y/N)[/]"

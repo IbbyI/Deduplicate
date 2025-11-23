@@ -1,4 +1,7 @@
 from functools import wraps
+from rich import print as rprint
+import utils.verbose as v
+
 
 VERBOSE = False
 
@@ -8,21 +11,26 @@ def set_verbose(value: bool):
     VERBOSE = value
 
 
-def verbose(message: str = None):
-    """
-    Decorator to Print Before and After a Function if Verbose Mode is Enabled.
-    Args:
-        message (str): Message to Print Before Function is Called.
-    """
-
+def verbose(context=None):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            if VERBOSE:
-                print(f"[VERBOSE] {message or func.__name__} ...")
+            if v.VERBOSE:
+                if isinstance(context, str):
+                    rprint(f"[yellow][VERBOSE] {context} ...[/]")
+                elif callable(context):
+                    rprint(f"[yellow][VERBOSE] {context(None)}[/]")
+
             result = func(*args, **kwargs)
-            if VERBOSE:
-                print(f"[VERBOSE] Done: {message or func.__name__}")
+
+            if v.VERBOSE:
+                if callable(context):
+                    rprint(f"[VERBOSE] context(result)[/]")
+                elif isinstance(context, str):
+                    rprint(f"[yellow][VERBOSE] Done: {context}[/]")
+                else:
+                    rprint(f"[yellow][VERBOSE] Done: {func.__name__}[/]")
+
             return result
 
         return wrapper
