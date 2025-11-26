@@ -1,15 +1,14 @@
 from pathlib import Path
-from rich import print as rprint
-from rich.prompt import Prompt
 from rich.progress import Progress
 
-from utils.log import log
-from utils.verbose import verbose
+from core.log import log
+from ui.verbose import verbose
+from ui.display import *
 
 progress = Progress()
 
 
-@verbose(lambda groups: f"Duplicate groups: {len(groups or [])}")
+@verbose(lambda groups: f"Unique Files: {len(groups or [])}")
 def find_duplicates(
     start_path: Path,
     ignore_path: Path | None,
@@ -24,10 +23,10 @@ def find_duplicates(
         None: If no duplicate files are found, returns None.
     """
     log(level="info", message=f"Scanning Path '{start_path}' For Duplicate Files...")
-    rprint(f"[light_sky_blue1]Scanning Path '{start_path}' For Duplicate Files...[/]")
+    info(f"Scanning Path '{start_path}' For Duplicate Files...")
     if ignore_path:
         log(level="info", message=f"Ignoring Path: {str(ignore_path)}")
-        rprint(f"[blue]Ignoring Path: {str(ignore_path)}[/]")
+        info(f"Ignoring Path: {str(ignore_path)}")
     try:
         progress.start()
         hashmap = {}
@@ -41,9 +40,8 @@ def find_duplicates(
                 hashmap.setdefault(hashed_file, []).append(file)
         duplicate_results = [value for value in hashmap.values() if len(value) > 1]
         if not duplicate_results:
-            rprint(
-                f"✅ [bold underline green]No Duplicates Found in Path: {start_path}[/]\n[blue]Terminating Program...[/]"
-            )
+            success(f"No Duplicates Found in Path: {start_path}")
+            info("Terminating Program...")
             log(
                 level="info",
                 message=f"✔ No Duplicates Found in Path: {start_path}\nTerminating Program...",

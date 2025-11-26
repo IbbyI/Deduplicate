@@ -28,4 +28,4 @@ def log(level: str, message: str, exc_info: bool = False) -> None:
     level = level.lower()
 
     write_log = log_levels.get(level, logger.info)
-    write_log(message, exc_info=exc_info)
+    return write_log(message, exc_info=exc_info)

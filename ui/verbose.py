@@ -1,7 +1,8 @@
 from functools import wraps
 from rich import print as rprint
-import utils.verbose as v
+import ui.verbose as v
 
+from ui.display import print_verbose
 
 VERBOSE = False
 
@@ -17,19 +18,14 @@ def verbose(context=None):
         def wrapper(*args, **kwargs):
             if v.VERBOSE:
                 if isinstance(context, str):
-                    rprint(f"[yellow][VERBOSE] {context} ...[/]")
-                elif callable(context):
-                    rprint(f"[yellow][VERBOSE] {context(None)}[/]")
+                    print_verbose(f"[VERBOSE] {context} ...")
 
             result = func(*args, **kwargs)
 
             if v.VERBOSE:
                 if callable(context):
-                    rprint(f"[VERBOSE] context(result)[/]")
-                elif isinstance(context, str):
-                    rprint(f"[yellow][VERBOSE] Done: {context}[/]")
-                else:
-                    rprint(f"[yellow][VERBOSE] Done: {func.__name__}[/]")
+                    print_verbose(f"[VERBOSE] {context(result)}")
+                print_verbose(f"[VERBOSE] Done: {func.__name__}")
 
             return result
 

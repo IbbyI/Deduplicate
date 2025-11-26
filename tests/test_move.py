@@ -2,7 +2,7 @@ import unittest
 import tempfile
 from pathlib import Path
 
-from utils.actions import move_duplicates
+from core.actions import move_duplicates
 
 
 class TestMoveFunction(unittest.TestCase):

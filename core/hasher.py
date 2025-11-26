@@ -1,10 +1,10 @@
 import hashlib
 from sys import exit
 from pathlib import Path
-from rich import print as rprint
 
-from utils.log import log
-from utils.verbose import verbose
+from core.log import log
+from ui.verbose import verbose
+from ui.display import error, info
 
 
 @verbose("Full Hashing File")
@@ -27,7 +27,7 @@ def full_hash(path: Path) -> str:
                 sha256_hash.update(chunk)
         return sha256_hash.hexdigest()
     except Exception as e:
-        rprint(f"❌ [bold underline red]Could Not Hash File {path}: {e}[/]")
+        error("Could Not Hash File {path}: {e}")
         log(
             level="error",
             message=f"❌ Could Not Hash File {path}: {e}",
@@ -58,7 +58,7 @@ def quick_hash(path: Path) -> str:
                 sha256_hash.update(f.read(4096))
         return sha256_hash.hexdigest()
     except Exception as e:
-        rprint(f"❌ [bold underline red]Could Not Fast Hash File {path}: {e}[/]")
+        error("Could Not Fast Hash File {path}: {e}")
         log(
             level="error",
             message=f"❌ Could Not Fast Hash File {path}: {e}",

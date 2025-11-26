@@ -1,17 +1,16 @@
 import shutil
 from os import remove
 from pathlib import Path
-from rich import print as rprint
-from rich.prompt import Prompt
 from rich.progress import Progress
 
-from utils.log import log
-from utils.verbose import verbose
+from core.log import log
+from ui.verbose import verbose
+from ui.display import error, info, success, warn
 
 progress = Progress()
 
 
-@verbose(lambda files: f"Moving {len(files)} duplicates")
+@verbose(lambda files: f"Moving {len(files or [])} duplicates")
 def move_duplicates(
     duplicate_files: list[Path], move_path: Path, dry_run_flag: bool
 ) -> None:
@@ -25,12 +24,12 @@ def move_duplicates(
     try:
         progress.start()
         move_task = progress.add_task("[blue]Moving Files", count=len(duplicate_files))
-        rprint(f"[blue]Moving Duplicate Files to {move_path}...[/]")
+        info(f"Moving Duplicate Files to {move_path}...")
         if dry_run_flag:
-            rprint("[bold green]Dry Run Enabled![/]")
+            success("Dry Run Enabled!")
         else:
             for f in duplicate_files:
-                rprint(f"[blue]Moving File: {f} to {move_path}[/]")
+                info(f"Moving File: {f} to {move_path}")
                 shutil.move(f, move_path)
                 log(level="info", message=f"Moved Newer File {f} to {move_path}")
                 progress.update(move_task, advance=move_task)
@@ -42,7 +41,7 @@ def move_duplicates(
         progress.stop()
 
 
-@verbose(lambda files: f"Deleting {len(files)} duplicates")
+@verbose(lambda files: f"Deleting {len(files or [])} duplicates")
 def delete_duplicates(duplicate_files: list[Path], dry_run_flag: bool) -> None:
     """
     Delete Duplicate Files.
@@ -55,9 +54,9 @@ def delete_duplicates(duplicate_files: list[Path], dry_run_flag: bool) -> None:
         delete_task = progress.add_task(
             "[bold red]Deleting Files...", count=len(duplicate_files)
         )
-        rprint("[bold reverse red]⚠️ Deleting Duplicates...[/]")
+        warn("Deleting Duplicates...")
         if dry_run_flag:
-            rprint("[bold green]Dry Run Enabled![/]")
+            info("Dry Run Enabled!")
             progress.update(delete_task, advance=len(duplicate_files))
         else:
             for f in duplicate_files:
@@ -82,8 +81,28 @@ def confirm_delete() -> bool:
     Returns:
         bool: True if User Confirms Deletion, False Otherwise.
     """
-    confirm = Prompt.ask(
-        "[bold reverse red]⚠️ Are you sure you want to delete all duplicates? (Y/N): [/]",
-        case_sensitive=False,
-    ).strip()
-    return confirm in ("y", "yes")
+    confirm = ask_yes_no(
+        "Are you sure you want to delete all duplicates?", style="red bold reverse"
+    )
+    return confirm
+
+
+def write_to_output(duplicate_files: list[Path], output_file: Path) -> None:
+    """
+    Write Results to Output File.
+    Args:
+        duplicate_files (list[Path]): List of Duplicate Files Found.
+        output_file (Path): Path of Output File to Write To.
+    """
+    try:
+        with open(output_file, "w") as f:
+            f.write("✅ Duplicate Files Found:\n")
+            for file in duplicate_files:
+                f.write(f"  -  {file}\n")
+        log(
+            level="info",
+            message=f"✔ Duplicate Results Written to Output File: {output_file}",
+        )
+        return success(f"Duplicate Results Written to Output File: {output_file}")
+    except (FileNotFoundError, PermissionError, OSError) as e:
+        return error(f"Could Not Write to Output File {output_file}: {e}")

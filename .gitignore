@@ -3,5 +3,4 @@ env/
 test/
 output.txt
 *.log
-utils/__pycache__
-tests/__pycache__
+*/__pycache__

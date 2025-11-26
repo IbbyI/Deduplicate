@@ -5,7 +5,7 @@ from pathlib import Path
 from hashlib import sha256
 from unittest.mock import patch
 
-from utils.hasher import auto_hash, full_hash, quick_hash
+from core.hasher import auto_hash, full_hash, quick_hash
 
 TEST_STRING = "Test Case"
 

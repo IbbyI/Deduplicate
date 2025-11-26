@@ -1,15 +1,11 @@
 from pathlib import Path
-from rich import print as rprint
-from rich.prompt import Prompt
-from rich.progress import Progress
 
-from utils.log import log
-from utils.verbose import verbose
-
-progress = Progress()
+from core.log import log
+from ui.verbose import verbose
+from ui.display import success, ask_yes_no, print_duplicates
 
 
-@verbose(lambda result: f"Found {len(result)} duplicate files")
+@verbose(lambda result: f"Found {len(result or [])} duplicate files")
 def compare_files(
     duplicate_results: list[list[Path]], keep_newest_file: bool = False
 ) -> list[Path]:
@@ -32,16 +28,13 @@ def compare_files(
             newer_files = [f for f in group if f != keep_file]
             result.extend(newer_files)
         number_of_duplicates = len(result)
-        rprint(
-            f"✅ [bold green underline]{number_of_duplicates} Duplicate Files Found:[/]"
-        )
+        success(f"{number_of_duplicates} Duplicate Files Found:")
         if number_of_duplicates > 30:
-            ask_print = Prompt.ask(
-                f"[bold blue]Would You Like To Print the Paths of All Duplicates To Console? (Y/N)[/]"
-            ).lower()
-            if ask_print not in ("yes", "y"):
-                return result
-        for f in result:
-            rprint(f"[grey54] -n {f}[/]")
+            ask_print = ask_yes_no(
+                "Would You Like To Print the Paths of All Duplicates To Console? ",
+                style="cyan",
+            )
+            if ask_print:
+                print_duplicates(result)
     finally:
         return result
