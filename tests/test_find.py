@@ -2,8 +2,8 @@ import unittest
 import tempfile
 from pathlib import Path
 
-from utils.scanner import find_duplicates
-from utils.hasher import auto_hash
+from core.scanner import find_duplicates
+from core.hasher import auto_hash
 
 
 class TestFileFunction(unittest.TestCase):

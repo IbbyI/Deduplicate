@@ -2,7 +2,7 @@ import unittest
 import tempfile
 from pathlib import Path
 
-from utils.comperator import compare_files
+from core.comperator import compare_files
 
 
 class TestCompareFunction(unittest.TestCase):

@@ -2,14 +2,112 @@ import sys
 import time
 import argparse
 from pathlib import Path
-from rich import print as rprint
 
-from utils.log import log
-from utils.hasher import full_hash, quick_hash, auto_hash
-from utils.verbose import set_verbose
-from utils.actions import move_duplicates, delete_duplicates, confirm_delete
-from utils.comperator import compare_files
-from utils.scanner import find_duplicates
+from core.log import log
+from core.hasher import full_hash, quick_hash, auto_hash
+
+from ui.verbose import set_verbose
+from ui.display import info, error
+from ui.adapter_scanner import find_duplicates_ui
+from ui.adapter_comperator import compare_files_ui, print_total_duplicates
+from ui.adapter_actions import (
+    confirm_delete,
+    handle_output_file,
+    handle_delete,
+    handle_move,
+)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """
+    Creates CLI Arguement Parser
+    Returns:
+        argparse.ArgumentParser: Returns Parser Object for Argument Specification
+    """
+    parser = argparse.ArgumentParser(
+        prog="Deduplicate",
+        description="Recursively check for duplicate files in a given directory.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "-ver",
+        "-VER",
+        "--version",
+        action="version",
+        version="Deduplicate 1.2.1",
+        help="Show Program Version.",
+    )
+    parser.add_argument(
+        "-vv",
+        "-VV",
+        "--verbose",
+        action="store_true",
+        help="Print Detailed Output For Debugging",
+    )
+    parser.add_argument(
+        "-p",
+        "-P",
+        "--path",
+        type=str,
+        nargs=1,
+        default="./",
+        help="Given Path to Run Program",
+    )
+    parser.add_argument(
+        "-del",
+        "--delete-duplicates",
+        action="store_true",
+        help="Delete All Duplicate Files Found.",
+    )
+    parser.add_argument(
+        "-mv",
+        "--move-duplicates",
+        nargs=1,
+        type=str,
+        help="Move Duplicate Files to given directory.",
+    )
+    parser.add_argument(
+        "-o",
+        "-O",
+        "--output-file",
+        nargs=1,
+        type=str,
+        help="Output File to Save Duplicate Results.",
+    )
+    parser.add_argument(
+        "-i",
+        "-I",
+        "--ignore-path",
+        nargs=1,
+        type=str,
+        help="Ignore a Specific Path from Search & Comparison.",
+    )
+    parser.add_argument(
+        "-kn",
+        "--keep-newest",
+        action="store_true",
+        help="Keeps the Newest Copy & Marks Older Files as Duplicates",
+    )
+    parser.add_argument(
+        "-f",
+        "-F",
+        "--full",
+        action="store_true",
+        help="Longer but More Accurate Check for Duplicates",
+    )
+    parser.add_argument(
+        "-q",
+        "-Q",
+        "--quick",
+        action="store_true",
+        help="Quick but Less Accurate Check for Duplicates",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Dry Run for Testing Moving & Deletion",
+    )
+    return parser.parse_args()
 
 
 def main(argv: list[str]) -> None:
@@ -18,93 +116,12 @@ def main(argv: list[str]) -> None:
     Args:
         argv (list[str]): List of Command Line Arguments.
     """
-    parser = argparse.ArgumentParser(
-        prog="Deduplicate",
-        description="Recursively check for duplicate files in a given directory.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
     try:
-        parser.add_argument(
-            "-ver",
-            "-VER",
-            "--version",
-            action="version",
-            version="Deduplicate 1.1.9",
-            help="Show Program Version.",
-        )
-        parser.add_argument(
-            "-vv",
-            "-VV",
-            "--verbose",
-            action="store_true",
-            help="Print Detailed Output For Debugging",
-        )
-        parser.add_argument(
-            "-p",
-            "-P",
-            "--path",
-            type=str,
-            nargs=1,
-            default="./",
-            help="Given Path to Run Program",
-        )
-        parser.add_argument(
-            "-del",
-            "--delete-duplicates",
-            action="store_true",
-            help="Delete All Duplicate Files Found.",
-        )
-        parser.add_argument(
-            "-mv",
-            "--move-duplicates",
-            nargs=1,
-            type=str,
-            help="Move Duplicate Files to given directory.",
-        )
-        parser.add_argument(
-            "-o",
-            "-O",
-            "--output-file",
-            nargs=1,
-            type=str,
-            help="Output File to Save Duplicate Results.",
-        )
-        parser.add_argument(
-            "-i",
-            "-I",
-            "--ignore-path",
-            nargs=1,
-            type=str,
-            help="Ignore a Specific Path from Search & Comparison.",
-        )
-        parser.add_argument(
-            "-kn",
-            "--keep-newest",
-            action="store_true",
-            help="Keeps the Newest Copy & Marks Older Files as Duplicates",
-        )
-        parser.add_argument(
-            "-f",
-            "-F",
-            "--full",
-            action="store_true",
-            help="Longer but More Accurate Check for Duplicates",
-        )
-        parser.add_argument(
-            "-q",
-            "-Q",
-            "--quick",
-            action="store_true",
-            help="Quick but Less Accurate Check for Duplicates",
-        )
-        parser.add_argument(
-            "--dry-run",
-            action="store_true",
-            help="Dry Run for Testing Moving & Deletion",
-        )
-        args = parser.parse_args()
+        args = build_parser()
         start_path = Path(args.path[0])
-        duplicate_path = Path(args.move_duplicates[0]) if args.move_duplicates else None
+        move_duplicate_path = (
+            Path(args.move_duplicates[0]) if args.move_duplicates else None
+        )
         output_file = Path(args.output_file[0]) if args.output_file else None
         ignore_path = Path(args.ignore_path[0]) if args.ignore_path else None
 
@@ -112,9 +129,9 @@ def main(argv: list[str]) -> None:
         delete_duplicates_flag = True if args.delete_duplicates else False
         dry_run_flag = True if args.dry_run else False
 
-        if dry_run_flag and not (delete_duplicates_flag or duplicate_path):
-            rprint(
-                "❌ [bold underline red]Dry Run Requires Either Moving or Deletion Flag.[/]"
+        if dry_run_flag and not (delete_duplicates_flag or move_duplicate_path):
+            raise argparse.ArgumentTypeError(
+                "Dry Run Requires Either Moving or Deletion Flag."
             )
             sys.exit(1)
 
@@ -131,78 +148,36 @@ def main(argv: list[str]) -> None:
             hash_method = auto_hash
 
         if not start_path.exists():
-            rprint("❌ [bold underline red]Start Path Does Not Exist.[/]")
-            log(
-                level="error",
-                message="✘ Start Path Does Not Exist.",
-                exc_info=True,
-            )
-            sys.exit(2)
+            return RuntimeError("Start Path Does Not Exist.")
 
-        duplicate_group = find_duplicates(
+        duplicate_group = find_duplicates_ui(
             start_path, ignore_path=ignore_path, hash_func=hash_method
         )
         if not duplicate_group:
-            return
-        duplicate_files = compare_files(duplicate_group, keep_newest_file)
+            raise RuntimeError("No Duplicates Found!")
+            sys.exit(0)
 
-        log(
-            level="info",
-            message=f"✔ Completed Search! Found {len(duplicate_files)} duplicate files!",
-        )
+        duplicate_files = compare_files_ui(duplicate_group, keep_newest_file)
+        print_total_duplicates(duplicate_files)
 
-        if duplicate_path:
-            if not duplicate_path.exists():
-                Path.mkdir(duplicate_path)
-                log(level="info", message=f"Directory Created at: {duplicate_path}")
-            move_duplicates(duplicate_files, duplicate_path, dry_run_flag)
+        if move_duplicate_path:
+            if not move_duplicate_path.exists():
+                Path.mkdir(move_duplicate_path)
+            handle_move(duplicate_files, move_duplicate_path, dry_run_flag)
 
         if delete_duplicates_flag:
             if confirm_delete():
-                delete_duplicates(duplicate_files, dry_run_flag)
+                handle_delete(duplicate_files, dry_run_flag)
 
         if output_file:
-            write_to_output(duplicate_files=duplicate_files, output_file=output_file)
+            handle_output_file(duplicate_files, output_file)
 
     except argparse.ArgumentError:
-        log(level="error", message="✘ Invalid Argument Error.", exc_info=True)
-        rprint("❌ [bold underline red]Invalid Argument Error.[/]")
+        return argparse.ArgumentTypeError("Invalid Argument Error.")
         parser.print_help()
-        sys.exit(2)
-    except FileNotFoundError as e:
-        log(level="error", message=f"✘ File Not Found: {e}", exc_info=True)
-        rprint(f"❌ [bold underline red]File Not Found: {e}[/]")
+    except FileNotFoundError:
+        raise FileNotFoundError("File Not Found.")
         sys.exit(1)
-
-
-def write_to_output(duplicate_files: list[Path], output_file: Path) -> None:
-    """
-    Write Results to Output File.
-    Args:
-        duplicate_files (list[Path]): List of Duplicate Files Found.
-        output_file (Path): Path of Output File to Write To.
-    """
-    try:
-        with open(output_file, "w") as f:
-            f.write("✔ Duplicate Files Found:\n")
-            for file in duplicate_files:
-                f.write(f"  -  {file}\n")
-        log(
-            level="info",
-            message=f"✔ Duplicate Results Written to Output File: {output_file}",
-        )
-        rprint(
-            f"✅ [bold underline green]Duplicate Results Written to Output File: {output_file}[/]"
-        )
-    except (FileNotFoundError, PermissionError, OSError) as e:
-        log(
-            level="error",
-            message=f"✘ Could Not Write to Output File {output_file}: {e}",
-            exc_info=True,
-        )
-        rprint(
-            f"❌ [bold underline red]Could Not Write to Output File {output_file}: {e}[/]"
-        )
 
 
 if __name__ == "__main__":
@@ -210,5 +185,4 @@ if __name__ == "__main__":
     log(level="info", message="Starting Program...")
     main(sys.argv[1:])
     time_taken = time.time() - start_time
-    log(level="info", message=f"Time Taken: {"%.2f" % time_taken}s")
-    rprint(f"[bold underline blue]Time Taken: {'%.2f' % time_taken}s[/]")
+    info(f"Time Taken: {'%.2f' % time_taken}s")

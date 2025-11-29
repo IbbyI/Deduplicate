@@ -1,6 +1,6 @@
 import unittest
 
-from utils.log import log
+from core.log import log
 
 
 class TestLogFunction(unittest.TestCase):
