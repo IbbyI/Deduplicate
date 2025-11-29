@@ -1,13 +1,10 @@
 import hashlib
-from sys import exit
 from pathlib import Path
 
-from core.log import log
 from ui.verbose import verbose
-from ui.display import error, info
 
 
-@verbose("Full Hashing File")
+@verbose(lambda args, file: f"Full Hashing File: {args[0]}")
 def full_hash(path: Path) -> str:
     """
     Compute SHA-256 Hash of Entire Contents of File in 4KB Chunks.
@@ -17,25 +14,19 @@ def full_hash(path: Path) -> str:
         str: SHA-256 Hash of File Contents
     """
     if path.is_dir():
-        raise ValueError(f"Cannot hash a directory: {path}")
+        raise ValueError(f"❌ Cannot hash a directory: {path}")
 
     try:
-        log(level="info", message=f"Chunk Hashing Contents from File {path}.")
         sha256_hash = hashlib.sha256()
         with open(path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
                 sha256_hash.update(chunk)
-        return sha256_hash.hexdigest()
     except Exception as e:
-        error("Could Not Hash File {path}: {e}")
-        log(
-            level="error",
-            message=f"❌ Could Not Hash File {path}: {e}",
-            exc_info=True,
-        )
+        raise RuntimeError(f"❌ Failed to hash file '{path}': {e}") from e
+    return sha256_hash.hexdigest()
 
 
-@verbose("Quick Hashing File")
+@verbose(lambda args, file: f"Quick Hashing File: {args[0]}")
 def quick_hash(path: Path) -> str:
     """
     Compute 4KB Chunks from Start and End of file using SHA-256 Hash of File Contents.
@@ -45,28 +36,25 @@ def quick_hash(path: Path) -> str:
         str: SHA-256 Hash of Sampled File Contents
     """
     if path.is_dir():
-        raise ValueError(f"Cannot hash a directory: {path}")
+        raise ValueError(f"❌ Cannot hash a directory: {path}")
 
     try:
-        log(level="info", message=f"Fast Hashing Contents from File {path}.")
         sha256_hash = hashlib.sha256()
         file_size = path.stat().st_size
+
         with open(path, "rb") as f:
             sha256_hash.update(f.read(4096))
             if file_size > 4096:
                 f.seek(-4096, 2)
                 sha256_hash.update(f.read(4096))
+
         return sha256_hash.hexdigest()
+
     except Exception as e:
-        error("Could Not Fast Hash File {path}: {e}")
-        log(
-            level="error",
-            message=f"❌ Could Not Fast Hash File {path}: {e}",
-            exc_info=True,
-        )
+        raise RuntimeError(f"❌ Failed to hash file '{path}': {e}") from e
 
 
-@verbose("Auto Hashing File")
+@verbose(lambda args, file: f"Auto Hashing File: {args[0]}")
 def auto_hash(path: Path) -> str:
     """
     Compute SHA-256 Hash of File Contents Based on File Size.
@@ -76,6 +64,9 @@ def auto_hash(path: Path) -> str:
     Returns:
         str: SHA-256 Hash of File Contents or Sample of File.
     """
-    if path.stat().st_size <= 2 * 1024 * 1024:
-        return full_hash(path)
+    try:
+        if path.stat().st_size <= 2 * 1024 * 1024:
+            return full_hash(path)
+    except Exception as e:
+        raise RuntimeError(f"❌ Failed to hash file '{path}': {e}") from e
     return quick_hash(path)

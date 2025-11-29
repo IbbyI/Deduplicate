@@ -5,16 +5,17 @@ from pathlib import Path
 
 from core.log import log
 from core.hasher import full_hash, quick_hash, auto_hash
+
 from ui.verbose import set_verbose
-from core.actions import (
-    move_duplicates,
-    delete_duplicates,
-    confirm_delete,
-    write_to_output,
-)
-from core.comperator import compare_files
-from core.scanner import find_duplicates
 from ui.display import info, error
+from ui.adapter_scanner import find_duplicates_ui
+from ui.adapter_comperator import compare_files_ui, print_total_duplicates
+from ui.adapter_actions import (
+    confirm_delete,
+    handle_output_file,
+    handle_delete,
+    handle_move,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -33,7 +34,7 @@ def build_parser() -> argparse.ArgumentParser:
         "-VER",
         "--version",
         action="version",
-        version="Deduplicate 1.1.9",
+        version="Deduplicate 1.2.1",
         help="Show Program Version.",
     )
     parser.add_argument(
@@ -129,7 +130,9 @@ def main(argv: list[str]) -> None:
         dry_run_flag = True if args.dry_run else False
 
         if dry_run_flag and not (delete_duplicates_flag or move_duplicate_path):
-            return error("Dry Run Requires Either Moving or Deletion Flag.")
+            raise argparse.ArgumentTypeError(
+                "Dry Run Requires Either Moving or Deletion Flag."
+            )
             sys.exit(1)
 
         if args.verbose:
@@ -145,32 +148,35 @@ def main(argv: list[str]) -> None:
             hash_method = auto_hash
 
         if not start_path.exists():
-            return error("Start Path Does Not Exist.")
+            return RuntimeError("Start Path Does Not Exist.")
 
-        duplicate_group = find_duplicates(
+        duplicate_group = find_duplicates_ui(
             start_path, ignore_path=ignore_path, hash_func=hash_method
         )
         if not duplicate_group:
-            return
-        duplicate_files = compare_files(duplicate_group, keep_newest_file)
+            raise RuntimeError("No Duplicates Found!")
+            sys.exit(0)
+
+        duplicate_files = compare_files_ui(duplicate_group, keep_newest_file)
+        print_total_duplicates(duplicate_files)
 
         if move_duplicate_path:
             if not move_duplicate_path.exists():
                 Path.mkdir(move_duplicate_path)
-            move_duplicates(duplicate_files, move_duplicate_path, dry_run_flag)
+            handle_move(duplicate_files, move_duplicate_path, dry_run_flag)
 
         if delete_duplicates_flag:
             if confirm_delete():
-                delete_duplicates(duplicate_files, dry_run_flag)
+                handle_delete(duplicate_files, dry_run_flag)
 
         if output_file:
-            write_to_output(duplicate_files=duplicate_files, output_file=output_file)
+            handle_output_file(duplicate_files, output_file)
 
     except argparse.ArgumentError:
-        return error("Invalid Argument Error.")
+        return argparse.ArgumentTypeError("Invalid Argument Error.")
         parser.print_help()
     except FileNotFoundError:
-        raise error("File Not Found.")
+        raise FileNotFoundError("File Not Found.")
         sys.exit(1)
 
 

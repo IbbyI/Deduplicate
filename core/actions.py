@@ -1,90 +1,77 @@
 import shutil
 from os import remove
 from pathlib import Path
-from rich.progress import Progress
 
-from core.log import log
 from ui.verbose import verbose
-from ui.display import error, info, success, warn
-
-progress = Progress()
 
 
-@verbose(lambda files: f"Moving {len(files or [])} duplicates")
+@verbose(
+    lambda args, result: (
+        "No Results."
+        if result is None
+        else f"Moved: {len(result["moved"])}\n"
+        f"Skipped: {len(result["skipped"])}\n"
+        f"Skipped: {len(result["errors"])}"
+    )
+)
 def move_duplicates(
     duplicate_files: list[Path], move_path: Path, dry_run_flag: bool
-) -> None:
+) -> dict[list[str | None]]:
     """
     Move Duplicate Files to Given Directory.
     Args:
         duplicate_files (list[Path]): List of Duplicate Files Found.
         move_path (Path): Path to Move Duplicate Files to.
         dry_run_flag (bool): Checks if Dry Run Flag is Enabled. False by Default.
+    Returns:
+        dict[list[str | None]]: Dictionary of All Files Moved, Skipped, or Failed to Move.
     """
-    try:
-        progress.start()
-        move_task = progress.add_task("[blue]Moving Files", count=len(duplicate_files))
-        info(f"Moving Duplicate Files to {move_path}...")
+    result = {"moved": [], "skipped": [], "errors": []}
+    for f in duplicate_files:
         if dry_run_flag:
-            success("Dry Run Enabled!")
-        else:
-            for f in duplicate_files:
-                info(f"Moving File: {f} to {move_path}")
-                shutil.move(f, move_path)
-                log(level="info", message=f"Moved Newer File {f} to {move_path}")
-                progress.update(move_task, advance=move_task)
-    except (OSError, shutil.Error):
-        log(
-            level="error", message=f"✘ Could Not Move {duplicate_files}.", exc_info=True
-        )
-    finally:
-        progress.stop()
+            result["skipped"].append(str(f))
+            continue
+
+        try:
+            shutil.move(f, move_path)
+            result["moved"].append(str(f))
+        except Exception as e:
+            result["errors"].append([str(f), e])
+    return result
 
 
-@verbose(lambda files: f"Deleting {len(files or [])} duplicates")
-def delete_duplicates(duplicate_files: list[Path], dry_run_flag: bool) -> None:
+@verbose(
+    lambda args, result: (
+        "No Results."
+        if result is None
+        else f"Deleted: {len(result["deleted"])}\n"
+        f"Skipped: {len(result["skipped"])}\n"
+        f"Skipped: {len(result["errors"])}"
+    )
+)
+def delete_duplicates(
+    duplicate_files: list[Path], dry_run_flag: bool
+) -> dict[list[str | None]]:
     """
     Delete Duplicate Files.
     Args:
         duplicate_files (list): List of Duplicate Files Found.
         dry_run_flag (bool): Checks if Dry Run Flag is Enabled. False by Default.
-    """
-    try:
-        progress.start()
-        delete_task = progress.add_task(
-            "[bold red]Deleting Files...", count=len(duplicate_files)
-        )
-        warn("Deleting Duplicates...")
-        if dry_run_flag:
-            info("Dry Run Enabled!")
-            progress.update(delete_task, advance=len(duplicate_files))
-        else:
-            for f in duplicate_files:
-                remove(f)
-                progress.update(delete_task, advance=delete_task)
-
-    except OSError:
-        log(
-            level="error",
-            message=f"✘ Could Not Delete {duplicate_files}.",
-            exc_info=True,
-        )
-    except Exception:
-        log(level="error", message="✘ Unexpected Error", exc_info=True)
-    finally:
-        progress.stop()
-
-
-def confirm_delete() -> bool:
-    """
-    Confirm Deletion of Duplicate Files from User.
     Returns:
-        bool: True if User Confirms Deletion, False Otherwise.
+        dict[list[str | None]]: Dictionary of All Files Deleted, Skipped, or Failed to Delete.
     """
-    confirm = ask_yes_no(
-        "Are you sure you want to delete all duplicates?", style="red bold reverse"
-    )
-    return confirm
+    result = {"deleted": [], "skipped": [], "errors": []}
+    for f in duplicate_files:
+        if dry_run_flag:
+            result["skipped"].append(str(f))
+            continue
+
+        try:
+            remove(f)
+            result["deleted"].append(str(f))
+        except Exception as e:
+            result["errors"].append([str(f), e])
+    return result
 
 
 def write_to_output(duplicate_files: list[Path], output_file: Path) -> None:
@@ -99,10 +86,5 @@ def write_to_output(duplicate_files: list[Path], output_file: Path) -> None:
             f.write("✅ Duplicate Files Found:\n")
             for file in duplicate_files:
                 f.write(f"  -  {file}\n")
-        log(
-            level="info",
-            message=f"✔ Duplicate Results Written to Output File: {output_file}",
-        )
-        return success(f"Duplicate Results Written to Output File: {output_file}")
-    except (FileNotFoundError, PermissionError, OSError) as e:
-        return error(f"Could Not Write to Output File {output_file}: {e}")
+    except Exception as e:
+        raise RuntimeError(f"❌ Failed To Write to {output_file}: {e}") from e

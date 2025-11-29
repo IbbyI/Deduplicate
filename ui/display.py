@@ -1,5 +1,5 @@
 from pathlib import Path
-from rich import print as rprint
+from rich import print as rprint, progress
 from rich.prompt import Prompt
 
 
@@ -12,7 +12,7 @@ def success(message: str) -> None:
 
 
 def warn(message: str) -> None:
-    rprint(f"⚠️[bold yellow] {message}[/]")
+    rprint(f"⚠️[bold yellow]  {message}[/]")
 
 
 def error(message: str) -> None:
