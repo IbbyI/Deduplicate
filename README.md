@@ -125,11 +125,6 @@ Scanning Path './test' For Duplicate Files...
 ## 🎯 Upcoming Features
 
 - **Export Options** Option to Export Duplicates as .json File or SQLite Database.
-- **Reformat** Split Logic Functions from UI
-- **Improve Unit Tests** Improve Unit Tests for Logic Only Tests & Test More Features
-- **Help Text** Help Text is Currently Cluttered. ALlow No Arguments for -p
-- **Tiered Hashing** Add Tiered Hashing if Collisions Occur
-- **Simplify UI** Make UI More User Friendly
 - **Improve Structure** Fix Project Structure so its PyPI Package-Ready
 
 ## 🧑‍💻 Author
