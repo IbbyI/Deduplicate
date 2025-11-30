@@ -4,3 +4,4 @@ test/
 output.txt
 *.log
 */__pycache__
+*.csv
