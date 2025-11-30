@@ -18,11 +18,11 @@ from ui.adapter_actions import (
 )
 
 
-def build_parser() -> argparse.ArgumentParser:
+def build_parser() -> argparse.Namespace:
     """
     Creates CLI Arguement Parser
     Returns:
-        argparse.ArgumentParser: Returns Parser Object for Argument Specification
+        argparse.Namespace: Returns Parser Object for Argument Specifications.
     """
     parser = argparse.ArgumentParser(
         prog="Deduplicate",
@@ -110,12 +110,18 @@ def build_parser() -> argparse.ArgumentParser:
     return parser.parse_args()
 
 
-def main(argv: list[str]) -> None:
+def main(argv: list[str]) -> int:
     """
     Main Function to Run Deduplication Program.
     Args:
         argv (list[str]): List of Command Line Arguments.
     """
+    try:
+        args = build_parser()
+    except Exception as e:
+        error("Could Not Create Command Line Arguments")
+        return 2
+
     try:
         args = build_parser()
         start_path = Path(args.path[0])
@@ -130,10 +136,8 @@ def main(argv: list[str]) -> None:
         dry_run_flag = True if args.dry_run else False
 
         if dry_run_flag and not (delete_duplicates_flag or move_duplicate_path):
-            raise argparse.ArgumentTypeError(
-                "Dry Run Requires Either Moving or Deletion Flag."
-            )
-            sys.exit(1)
+            error("Dry Run Requires Either Moving or Deletion Flag.")
+            return 2
 
         if args.verbose:
             set_verbose(True)
@@ -148,16 +152,22 @@ def main(argv: list[str]) -> None:
             hash_method = auto_hash
 
         if not start_path.exists():
-            return RuntimeError("Start Path Does Not Exist.")
+            error("Start Path Does Not Exist.")
+            return 1
+
+        if not start_path.is_dir():
+            error("Start Path is Not a Directory.")
+            return 1
 
         duplicate_group = find_duplicates_ui(
             start_path, ignore_path=ignore_path, hash_func=hash_method
         )
         if not duplicate_group:
-            raise RuntimeError("No Duplicates Found!")
-            sys.exit(0)
+            error("No Duplicates Found!")
+            return 0
 
         duplicate_files = compare_files_ui(duplicate_group, keep_newest_file)
+
         print_total_duplicates(duplicate_files)
 
         if move_duplicate_path:
@@ -171,13 +181,14 @@ def main(argv: list[str]) -> None:
 
         if output_file:
             handle_output_file(duplicate_files, output_file)
+        return 0
 
     except argparse.ArgumentError:
-        return argparse.ArgumentTypeError("Invalid Argument Error.")
-        parser.print_help()
+        error("Invalid Argument Error.")
+        return 2
     except FileNotFoundError:
-        raise FileNotFoundError("File Not Found.")
-        sys.exit(1)
+        error("File Not Found.")
+        return 2
 
 
 if __name__ == "__main__":
