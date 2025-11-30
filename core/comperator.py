@@ -18,6 +18,6 @@ def compare_files(
         else:
             keep_file = min(group, key=lambda f: f.stat().st_mtime)
 
-        newer_files = [f for f in group if f != keep_file]
-        result.extend(newer_files)
+        kept_files = [f for f in group if f != keep_file]
+        result.extend(kept_files)
     return result
