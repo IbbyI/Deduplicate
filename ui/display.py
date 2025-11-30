@@ -19,7 +19,7 @@ def error(message: str) -> None:
     rprint(f"❌[bold red] {message}[/]")
 
 
-def print_verbose(message: str) -> None:
+def print_verbose(message: object) -> None:
     rprint(f"[yellow]{message}[/]")
 
 
