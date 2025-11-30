@@ -1,13 +1,10 @@
 from pathlib import Path
 from typing import Callable
 
-from ui.verbose import verbose
 
-
-@verbose(lambda args, group: f"Found File: {args[0]}")
 def find_duplicates(
     start_path: Path, ignore_path: Path | None, hash_func: Callable[[Path], str]
-) -> list[list[str]] | None:
+) -> list[list[Path]] | None:
     """
     Find Duplicate Files in Given Path.
     Args:
