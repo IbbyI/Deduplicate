@@ -24,6 +24,7 @@ def verbose(context=None):
      Returns:
         (function): Wrapped Function with Verbose Logging.
     """
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
