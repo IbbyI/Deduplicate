@@ -5,7 +5,7 @@ from core.log import log
 from core.comperator import compare_files
 
 from ui.verbose import verbose
-from ui.display import ask_yes_no, print_duplicates
+from ui.display import ask_yes_no, print_duplicates, error
 
 progress = Progress()
 
@@ -13,7 +13,7 @@ progress = Progress()
 @verbose(lambda args, files: f"Duplicate Files Found: {len(files or [])}")
 def compare_files_ui(
     duplicate_results: list[list[Path]], keep_newest_file: bool = False
-) -> list[Path] | list:
+) -> list[Path]:
     """
     Handles UI Elements for the Comparison Logic.
     Args:
@@ -23,20 +23,19 @@ def compare_files_ui(
     """
     progress.start()
     try:
-        compare_task = progress.add_task(
-            "[purple]Comparing Files            ", total=None
-        )
+        progress.add_task("[purple]Comparing Files            ", total=None)
         log(level="info", message="Comparing Files")
         result = compare_files(duplicate_results, keep_newest_file)
-    except RuntimeError as e:
-        warn(str(e))
+        return result
+    except Exception as e:
+        error(str(e))
         log(level="error", message=str(e))
+        return []
     finally:
         progress.stop()
-    return result
 
 
-def print_total_duplicates(result: list[Path]):
+def print_total_duplicates(result: list[Path]) -> None:
     """
     Handles Printing Duplicates to Console Based on User Input.
     Args:
