@@ -122,11 +122,6 @@ Scanning Path './test' For Duplicate Files...
 
 ---
 
-## 🎯 Upcoming Features
-
-- **Export Options** Option to Export Duplicates as .json File or SQLite Database.
-- **Improve Structure** Fix Project Structure so its PyPI Package-Ready
-
 ## 🧑‍💻 Author
 
 Created by [**Ibby I.**](https://github.com/IbbyI)
