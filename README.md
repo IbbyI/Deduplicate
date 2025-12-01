@@ -1,14 +1,14 @@
-[![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](https://www.python.org/)
+# 🧹 **Deduplicate**
+
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python)](https://www.python.org/)
+[![PyPI](https://img.shields.io/pypi/v/deduplicate-cli.svg?color=blue)](https://pypi.org/project/deduplicate-cli/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Cross--platform-green)](#)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](#)
+![Platform](https://img.shields.io/badge/Platform-Cross--platform-green)
+![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-# 🧹 Deduplicate!
-
-A lightweight, command-line Python tool that scans directories for duplicate files using **SHA-256 hashing**.
-It identifies identical files across nested folders and gives you the option to **delete** or **move** them safely.
-
+A lightweight, fast command-line Python tool that scans directories for duplicate files using **SHA-256 hashing**.
+It identifies identical files across nested folders.
 ---
 
 ## ✨ Features
@@ -19,32 +19,54 @@ It identifies identical files across nested folders and gives you the option to 
 - 🪣 **Move or Delete** - Move duplicates to a separate directory or delete them permanently.
 - 🧠 **Logging** - Every action is logged in `deduplicate.log` for traceability.
 - 🧾 **Error Handling** - Graceful exits and detailed exception logging.
+* ⚠️ **Protected operations** with confirmation prompts
+* 🛠️ **Supports full, quick, and automatic hashing strategies**
+* 🗜️ **Dry-run mode** for safe testing
+* 🧼 **Clean Architecture:** Core logic separated from UI and CLI
 
 ---
 
-## 🧰 Requirements
-
-- Python 3.8+
-
-Install Required Packages via:
+# 📦 **Project Structure**
 
 ```
-python -m pip install -r requirements.txt
+deduplicate/
+│
+├── core/           # Pure Logic
+├── ui/             # UI Adapters / Printing / Prompts
+├── cli/            # CLI Entry Point (Argument Parsing)
+│
+└── tests/          # Unit Tests
 ```
 
 ---
 
-## ⚙️ Usage
+# 🚀 **Installation**
 
-### 🔧 Command Syntax
+### **From PyPI (Recommended)**
 
 ```
-python dedupe.py -p <path> [-v] [-mv <destination>] [-del] [-o <destination>]
+pip install deduplicate-cli
 ```
+
+Then run:
+
+```
+dedupe -p ./Downloads
+```
+
+### **From Source**
+
+```
+git clone https://github.com/IbbyI/Deduplicate.git
+cd Deduplicate
+pip install -r requirements.txt
+```
+
+---
 
 ### 🧩 Arguments
 
-| Flag   | Long Form             | Description                                   | Example            |
+| Flag   | Long Option           | Description                                   | Example            |
 | ------ | --------------------- | --------------------------------------------- | ------------------ |
 | `-v`   | `--version`           | Program Version Number                        | `-v`               |
 | `-vv`  | `--verbose`           | Detailed Output for Debugging                 | `-vv`              |
@@ -56,74 +78,98 @@ python dedupe.py -p <path> [-v] [-mv <destination>] [-del] [-o <destination>]
 | `-kn`  | `--keep-newest`       | Option to Keep the Newest File                | `-kn`              |
 | `-f`   | `--full`              | More Accurate Duplicate Check                 | `-f`               |
 | `-q`   | `--quick`             | Less Accurate Duplicate Check                 | `-q`               |
-| `N/A`   | `--dry-run`           | Tests Run Move and Delete Functionality       | `--dry-run`       |
+| `N/A`  | `--dry-run`           | Tests Run Move and Delete Functionality       | `--dry-run`        |
+
 ---
 
-### 💻 Examples
+# 💻 **Examples**
 
-**Find duplicates in current directory**
-
-```
-python dedupe.py -p ./
-```
-
-**Find duplicates in current directory & create output file**
+### **Find duplicates**
 
 ```
-python dedupe.py -p ./ -o ./output.txt
+dedupe -p ./
 ```
 
-**Move all duplicates to a separate folder**
+### **Move duplicates to a folder**
 
 ```
-python dedupe.py -p ./Documents -mv ./Duplicates
+dedupe -p ./Documents -mv ./Duplicates
 ```
 
-**Delete duplicates (with confirmation)**
+### **Delete duplicates (with safety prompt)**
 
 ```
-python dedupe.py -p ./test -del
+dedupe -p ./Photos -del
 ```
 
-**Ignore directory from search**
+### **Ignore a cache directory**
 
 ```
-python dedupe.py -p ./test -i ./test/cache/
+dedupe -p ./project -i ./project/.cache/
 ```
 
-**Get current version of program**
+### **Write results to output file**
 
 ```
-python dedupe.py -v
+dedupe -p ./ -o ./duplicates.txt
 ```
 
 ---
 
-## 🧠 How It Works
+# 🧠 **How It Works**
 
-1. **Scan:** Deduplicate recursively scans all files in the given directory & optionally ignore specific directory.
-2. **Hash:** Each file’s contents are hashed using **SHA-256**, creating a unique signature.
-3. **Compare:** Files with identical hashes are grouped together.
-4. **Action:** You choose whether to **move** or **delete** duplicates.
-5. **Log:** Every operation is recorded in `deduplicate.log`.
-
----
-
-## 📄 Example Output
-
-```
-
-Scanning Path './test' For Duplicate Files...
-✅ Duplicate Files Found:
-- ./test/subdir/a_copy.txt
-  ⚠️ Are you sure you want to delete all duplicates? (Y/N): y
-  ✅ Duplicate Files Successfully Deleted.
-```
+1. **Scan** – Recursively walks the directory.
+2. **Hash** – Computes SHA-256 of each file (full, quick, or auto).
+3. **Group** – Groups files with identical hashes.
+4. **Compare** – Identifies which file to keep (oldest or newest).
+5. **Action** – Moves or deletes duplicates depending on CLI flags.
+6. **Log** – Everything is recorded to `deduplicate.log`.
 
 ---
 
-## 🧑‍💻 Author
+# 📄 **Example Output**
 
-Created by [**Ibby I.**](https://github.com/IbbyI)
+```
+Scanning './test' for duplicates...
+Unique Files Found: 42
+Duplicate Files Found: 3
 
-Developer passionate about automation, efficiency, and clean code.
+⚠️ Delete all duplicates? (Y/N): y
+✅ Deleted 3 files.
+⚠️ Skipped 2 files.
+```
+
+---
+
+# 🧪 **Testing**
+
+This project includes unit tests for:
+
+* hashing functions
+* duplicate detection
+* compare logic
+* file actions (move/delete)
+
+Run tests using:
+
+```
+pytest
+```
+
+---
+
+# 🧑‍💻 **Author**
+
+**Ibby I.**
+GitHub: [https://github.com/IbbyI](https://github.com/IbbyI)
+
+Passionate about automation, performance, clean architecture, and building developer-friendly tools.
+
+
+# ⭐ **Support the Project**
+
+If you found this useful, consider starring the repo:
+
+👉 [https://github.com/IbbyI/Deduplicate](https://github.com/IbbyI/Deduplicate)
+
+---
