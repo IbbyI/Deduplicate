@@ -1,5 +1,5 @@
 [project]
-name = "deduplicate"
+name = "deduplicate-cli"
 version = "1.2.1"
 description = "A fast CLI tool to find and manage duplicate files."
 readme = "README.md"
