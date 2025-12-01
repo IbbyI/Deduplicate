@@ -1,0 +1,26 @@
+[project]
+name = "deduplicate"
+version = "1.2.1"
+description = "A fast CLI tool to find and manage duplicate files."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+  { name="Ibby", email="ibrahimissa00@proton.me" }
+]
+
+dependencies = [
+  "rich",
+]
+
+[project.urls]
+Homepage = "https://github.com/IbbyI/deduplicate"
+Source = "https://github.com/IbbyI/deduplicate"
+Issues = "https://github.com/IbbyI/deduplicate/issues"
+
+[project.scripts]
+dedupe = "cli.dedupe:main"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
