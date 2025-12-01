@@ -1,13 +1,10 @@
-import sys
-import time
 import argparse
 from pathlib import Path
 
-from core.log import log
 from core.hasher import full_hash, quick_hash, auto_hash
 
 from ui.verbose import set_verbose
-from ui.display import info, error
+from ui.display import error, success
 from ui.adapter_scanner import find_duplicates_ui
 from ui.adapter_comperator import compare_files_ui, print_total_duplicates
 from ui.adapter_actions import (
@@ -34,7 +31,7 @@ def build_parser() -> argparse.Namespace:
         "-VER",
         "--version",
         action="version",
-        version="Deduplicate 1.2.1",
+        version="Deduplicate 1.2.2",
         help="Show Program Version.",
     )
     parser.add_argument(
@@ -50,7 +47,6 @@ def build_parser() -> argparse.Namespace:
         "--path",
         type=str,
         nargs=1,
-        default="./",
         help="Given Path to Run Program",
     )
     parser.add_argument(
@@ -129,7 +125,7 @@ def main(argv=None) -> int:
 
     try:
         args = build_parser()
-        start_path = Path(args.path[0])
+        start_path = Path(args.path[0]) if args.path else Path.cwd()
         move_duplicate_path = (
             Path(args.move_duplicates[0]) if args.move_duplicates else None
         )
@@ -142,7 +138,7 @@ def main(argv=None) -> int:
 
         if dry_run_flag and not (delete_duplicates_flag or move_duplicate_path):
             error("Dry Run Requires Either Moving or Deletion Flag.")
-            return 2
+            return 1
 
         if args.verbose:
             set_verbose(True)
@@ -159,6 +155,10 @@ def main(argv=None) -> int:
         if not start_path.exists():
             error("Start Path Does Not Exist.")
             return 1
+        
+        if not start_path:
+            error("Start Path Does Not Exist.")
+            return 1
 
         if not start_path.is_dir():
             error("Start Path is Not a Directory.")
@@ -168,7 +168,7 @@ def main(argv=None) -> int:
             start_path, ignore_path=ignore_path, hash_func=hash_method
         )
         if not duplicate_group:
-            error("No Duplicates Found!")
+            success("No Duplicates Found!")
             return 0
 
         duplicate_files = compare_files_ui(duplicate_group, keep_newest_file)
@@ -193,4 +193,7 @@ def main(argv=None) -> int:
         return 2
     except FileNotFoundError:
         error("File Not Found.")
+        return 2
+    except Exception as e:
+        error(f"An Unexpected Error Occurred: {e}")
         return 2
