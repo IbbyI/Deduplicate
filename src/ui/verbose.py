@@ -1,5 +1,4 @@
 from functools import wraps
-import ui.verbose as v
 
 from ui.display import print_verbose
 

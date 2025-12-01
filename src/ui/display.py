@@ -1,5 +1,5 @@
 from pathlib import Path
-from rich import print as rprint, progress
+from rich import print as rprint
 from rich.prompt import Prompt
 
 
