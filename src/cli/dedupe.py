@@ -110,12 +110,17 @@ def build_parser() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main(argv: list[str]) -> int:
+def main(argv=None) -> int:
     """
     Main Function to Run Deduplication Program.
     Args:
         argv (list[str]): List of Command Line Arguments.
     """
+    import sys
+
+    if argv is None:
+        argv = sys.argv[1:]
+        
     try:
         args = build_parser()
     except Exception as e:
@@ -189,11 +194,3 @@ def main(argv: list[str]) -> int:
     except FileNotFoundError:
         error("File Not Found.")
         return 2
-
-
-if __name__ == "__main__":
-    start_time = time.time()
-    log(level="info", message="Starting Program...")
-    main(sys.argv[1:])
-    time_taken = time.time() - start_time
-    info(f"Time Taken: {'%.2f' % time_taken}s")
