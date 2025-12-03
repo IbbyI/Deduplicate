@@ -51,7 +51,7 @@ pip install deduplicate-cli
 Then run:
 
 ```
-dedupe -p ./Downloads
+dedupe -p ~/Downloads
 ```
 
 ### **From Source**
@@ -93,13 +93,13 @@ dedupe -p ./
 ### **Move duplicates to a folder**
 
 ```
-dedupe -p ./Documents -mv ./Duplicates
+dedupe -p ~/Documents -mv ./Duplicates
 ```
 
 ### **Delete duplicates (with safety prompt)**
 
 ```
-dedupe -p ./Photos -del
+dedupe -p ~/Photos -del
 ```
 
 ### **Ignore a cache directory**
@@ -132,7 +132,7 @@ dedupe -p ./ -o ./duplicates.txt
 ```
 Scanning './test' for duplicates...
 Unique Files Found: 42
-Duplicate Files Found: 3
+Duplicate Files Found: 5
 
 ⚠️ Delete all duplicates? (Y/N): y
 ✅ Deleted 3 files.
@@ -149,12 +149,6 @@ This project includes unit tests for:
 * duplicate detection
 * compare logic
 * file actions (move/delete)
-
-Run tests using:
-
-```
-pytest
-```
 
 ---
 
