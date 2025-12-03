@@ -1,6 +1,6 @@
 [project]
 name = "deduplicate-cli"
-version = "1.2.2"
+version = "1.2.3"
 description = "A fast CLI tool to find and manage duplicate files."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -19,7 +19,7 @@ Source = "https://github.com/IbbyI/deduplicate"
 Issues = "https://github.com/IbbyI/deduplicate/issues"
 
 [project.scripts]
-dedupe = "cli.dedupe:main"
+dedupe = "cli.entrypoint:entrypoint"
 
 [build-system]
 requires = ["setuptools", "wheel"]
