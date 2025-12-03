@@ -31,7 +31,7 @@ def build_parser() -> argparse.Namespace:
         "-VER",
         "--version",
         action="version",
-        version="Deduplicate 1.2.2",
+        version="Deduplicate 1.2.3",
         help="Show Program Version.",
     )
     parser.add_argument(
@@ -116,11 +116,11 @@ def main(argv=None) -> int:
 
     if argv is None:
         argv = sys.argv[1:]
-        
+
     try:
         args = build_parser()
     except Exception as e:
-        error("Could Not Create Command Line Arguments")
+        error("Could Not Create Command Line Arguments", style="")
         return 2
 
     try:
@@ -137,7 +137,7 @@ def main(argv=None) -> int:
         dry_run_flag = True if args.dry_run else False
 
         if dry_run_flag and not (delete_duplicates_flag or move_duplicate_path):
-            error("Dry Run Requires Either Moving or Deletion Flag.")
+            error("Dry Run Requires Either Moving or Deletion Flag.", style="")
             return 1
 
         if args.verbose:
@@ -153,22 +153,22 @@ def main(argv=None) -> int:
             hash_method = auto_hash
 
         if not start_path.exists():
-            error("Start Path Does Not Exist.")
+            error("Start Path Does Not Exist.", style="")
             return 1
-        
+
         if not start_path:
-            error("Start Path Does Not Exist.")
+            error("Start Path Does Not Exist.", style="")
             return 1
 
         if not start_path.is_dir():
-            error("Start Path is Not a Directory.")
+            error("Start Path is Not a Directory.", style="")
             return 1
 
         duplicate_group = find_duplicates_ui(
             start_path, ignore_path=ignore_path, hash_func=hash_method
         )
         if not duplicate_group:
-            success("No Duplicates Found!")
+            success("No Duplicates Found!", style="")
             return 0
 
         duplicate_files = compare_files_ui(duplicate_group, keep_newest_file)
@@ -189,11 +189,11 @@ def main(argv=None) -> int:
         return 0
 
     except argparse.ArgumentError:
-        error("Invalid Argument Error.")
+        error("Invalid Argument Error.", style="")
         return 2
     except FileNotFoundError:
-        error("File Not Found.")
+        error("File Not Found.", style="")
         return 2
     except Exception as e:
-        error(f"An Unexpected Error Occurred: {e}")
+        error(f"An Unexpected Error Occurred: {e}", style="")
         return 2
