@@ -3,20 +3,20 @@ from rich import print as rprint
 from rich.prompt import Prompt
 
 
-def info(message: str) -> None:
-    rprint(f"[bold cyan]{message}[/]")
+def info(message: str, style: str | None = None) -> None:
+    rprint(f"[bold {style} cyan]{message}[/]")
 
 
-def success(message: str) -> None:
-    rprint(f"✅[bold green] {message}[/]")
+def success(message: str, style: str | None = None) -> None:
+    rprint(f"✅[bold {style} green] {message}[/]")
 
 
-def warn(message: str) -> None:
-    rprint(f"⚠️[bold yellow]  {message}[/]")
+def warn(message: str, style: str | None = None) -> None:
+    rprint(f"⚠️[bold {style} yellow]  {message}[/]")
 
 
-def error(message: str) -> None:
-    rprint(f"❌[bold red] {message}[/]")
+def error(message: str, style: str | None = None) -> None:
+    rprint(f"❌[bold {style} red] {message}[/]")
 
 
 def print_verbose(message: object) -> None:
