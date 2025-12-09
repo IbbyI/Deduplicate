@@ -23,7 +23,7 @@ class TestCompareFunction(unittest.TestCase):
 
         try:
             compare_list = [[src_file1, src_file2]]
-            comparison = compare_files(duplicate_results=compare_list)
+            comparison = compare_files(duplicate_files=compare_list)
 
             self.assertTrue(src_file1.exists())
             self.assertTrue(src_file2.exists())
