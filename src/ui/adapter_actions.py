@@ -1,11 +1,17 @@
 from pathlib import Path
 
 from os.path import splitext
+
 from ui.verbose import verbose
 from ui.display import ask_yes_no, success, warn, error
 
 from core.log import log
-from core.actions import write_to_output, delete_duplicates, move_duplicates
+from core.actions import (
+    write_to_output,
+    delete_duplicates,
+    move_duplicates,
+    output_file_format,
+)
 
 
 @verbose(
@@ -29,8 +35,6 @@ def handle_move(
     Returns:
         dict[str, list[Path | str]]: Dictionary of All Files Moved, Skipped, or Failed to Move.
     """
-    if dry_run_flag:
-        success("Dry Run Flag Enabled!")
     result: dict[str, list[str | list[str | Exception]]] = move_duplicates(
         duplicate_files, move_path, dry_run_flag
     )
@@ -39,10 +43,10 @@ def handle_move(
         message=f"Moved: {result["moved"]}, skipped: {result["skipped"]}, errors: {result["errors"]}",
     )
 
-    success(f"Moved: {len(result["moved"])} Files.")
-    warn(f"Skipped: {len(result["skipped"])} Files.")
+    success(f"Moved: {len(result["moved"])} Files.", style="")
+    warn(f"Skipped: {len(result["skipped"])} Files.", style="")
     if result["errors"]:
-        error(f"Errors: {len(result["errors"])} Files.")
+        error(f"Errors: {len(result["errors"])} Files.", style="")
     return result
 
 
@@ -66,8 +70,6 @@ def handle_delete(
     Returns:
         dict[list[str | None]]: Dictionary of All Files Deleted, Skipped, or Failed to Delete.
     """
-    if dry_run_flag:
-        success("Dry Run Flag Enabled!")
     result: dict[str, list[str | list[str | Exception]]] = delete_duplicates(
         duplicate_files, dry_run_flag
     )
@@ -82,6 +84,9 @@ def handle_delete(
     return result
 
 
+@verbose(
+    lambda args, result: f"Output File Set as {args[1]}, Duplicate Files Passed: {True if args[0] else False}"
+)
 def handle_output_file(duplicate_files: list[Path], output_file: Path) -> None:
     """
     Handles UI to Write to Output File.
@@ -91,8 +96,11 @@ def handle_output_file(duplicate_files: list[Path], output_file: Path) -> None:
     """
     try:
         file_extension = splitext(output_file)[1]
-        write_to_output(duplicate_files, output_file, file_extension)
-        success(f"Sucessfully Wrote to Output File: {output_file}")
+        output_file_data = output_file_format(duplicate_files)
+        write_to_output(output_file_data, output_file, file_extension)
+        success(
+            f"Sucessfully Wrote to Output File: {output_file}", style="bold underline"
+        )
     except IOError as e:
         log(
             level="error",
@@ -101,12 +109,18 @@ def handle_output_file(duplicate_files: list[Path], output_file: Path) -> None:
         raise IOError(f"❌ Failed To Write to Output File: {output_file}, {e}") from e
 
 
-def confirm_delete() -> bool:
+@verbose(lambda args, confirm: f"Requesting Confirmation from User. {confirm}")
+def confirm_delete(dry_run_flag: bool = False) -> bool:
     """
     Confirm Deletion of Duplicate Files from User.
     Returns:
         bool: True if User Confirms Deletion, False Otherwise.
     """
+    if dry_run_flag:
+        success(
+            "Dry Run Flag Enabled! Duplicates Will Not Be Affected.",
+            style="bold reverse",
+        )
     confirm = ask_yes_no(
         "Are you sure you want to delete all duplicates?", style="red bold reverse"
     )
