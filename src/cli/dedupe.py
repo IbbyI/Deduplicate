@@ -1,10 +1,9 @@
 import argparse
 from pathlib import Path
 
-from core.hasher import full_hash, quick_hash, auto_hash
-
 from ui.verbose import set_verbose
 from ui.display import error, success
+from ui.adapter_hasher import choose_hash_func
 from ui.adapter_scanner import find_duplicates_ui
 from ui.adapter_comperator import compare_files_ui, print_total_duplicates
 from ui.adapter_actions import (
@@ -31,7 +30,7 @@ def build_parser() -> argparse.Namespace:
         "-VER",
         "--version",
         action="version",
-        version="Deduplicate 1.2.3",
+        version="Deduplicate 1.2.4",
         help="Show Program Version.",
     )
     parser.add_argument(
@@ -124,8 +123,7 @@ def main(argv=None) -> int:
         return 2
 
     try:
-        args = build_parser()
-        start_path = Path(args.path[0]) if args.path else Path.cwd()
+        start_path = Path(args.path[0]).absolute() if args.path else Path.cwd()
         move_duplicate_path = (
             Path(args.move_duplicates[0]) if args.move_duplicates else None
         )
@@ -145,18 +143,9 @@ def main(argv=None) -> int:
         else:
             set_verbose(False)
 
-        if args.full:
-            hash_method = full_hash
-        elif args.quick:
-            hash_method = quick_hash
-        else:
-            hash_method = auto_hash
+        hash_method = choose_hash_func(args=[args.full, args.quick])
 
         if not start_path.exists():
-            error("Start Path Does Not Exist.", style="")
-            return 1
-
-        if not start_path:
             error("Start Path Does Not Exist.", style="")
             return 1
 
@@ -181,7 +170,7 @@ def main(argv=None) -> int:
             handle_move(duplicate_files, move_duplicate_path, dry_run_flag)
 
         if delete_duplicates_flag:
-            if confirm_delete():
+            if confirm_delete(dry_run_flag):
                 handle_delete(duplicate_files, dry_run_flag)
 
         if output_file:
