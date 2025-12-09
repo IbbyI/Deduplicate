@@ -1,6 +1,13 @@
 from pathlib import Path
-from rich import print as rprint
-from rich.prompt import Prompt
+
+
+try:
+    from rich import print as rprint
+    from rich.prompt import Prompt
+except ImportError:
+    raise ImportError(
+        "Rich Package Required. Please install using command:\npip install rich"
+    )
 
 
 def info(message: str, style: str | None = None) -> None:
@@ -23,8 +30,8 @@ def print_verbose(message: object) -> None:
     rprint(f"[yellow]{message}[/]")
 
 
-def print_duplicates(duplicate_results: list[Path]) -> None:
-    for f in duplicate_results:
+def print_duplicates(duplicate_files: list[Path]) -> None:
+    for f in duplicate_files:
         rprint(f"[grey54] - {f}[/]")
 
 
