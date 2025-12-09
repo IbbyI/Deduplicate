@@ -1,4 +1,5 @@
 from functools import wraps
+from typing import Callable
 
 from ui.display import print_verbose
 
@@ -15,30 +16,26 @@ def set_verbose(value: bool):
     VERBOSE = value
 
 
-def verbose(context=None):
+def verbose(context=None) -> Callable:
     """
     Verbose Decorator That Prints Detailed Debugging Messages to Console.
     Args:
         context (str | Callable): Determines the message to print.
      Returns:
-        (function): Wrapped Function with Verbose Logging.
+        Callable: Wrapped Function with Verbose Logging.
     """
 
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
 
-            if VERBOSE:
-                if callable(context):
-                    print_verbose(context(args, None))
-                elif isinstance(context, str):
-                    print_verbose(f"[VERBOSE] {context}")
-
             result = func(*args, **kwargs)
 
             if VERBOSE:
                 if callable(context):
                     print_verbose(context(args, result))
+                elif isinstance(context, str):
+                    print_verbose(f"[VERBOSE] {context}")
 
             return result
 
