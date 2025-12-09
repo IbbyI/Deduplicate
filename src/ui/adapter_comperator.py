@@ -12,12 +12,12 @@ progress = Progress()
 
 @verbose(lambda args, files: f"Duplicate Files Found: {len(files or [])}")
 def compare_files_ui(
-    duplicate_results: list[list[Path]], keep_newest_file: bool = False
+    duplicate_files: list[list[Path]], keep_newest_file: bool = False
 ) -> list[Path]:
     """
     Handles UI Elements for the Comparison Logic.
     Args:
-        duplicate_results (list): List of nested arrays containing paths of duplicate files.
+        duplicate_files (list): List of nested arrays containing paths of duplicate files.
     Returns:
         list[Path]: List of duplicate files, with the oldest file removed from each group.
     """
@@ -25,7 +25,7 @@ def compare_files_ui(
     try:
         progress.add_task("[purple]Comparing Files            ", total=None)
         log(level="info", message="Comparing Files")
-        result = compare_files(duplicate_results, keep_newest_file)
+        result = compare_files(duplicate_files, keep_newest_file)
         return result
     except Exception as e:
         error(str(e))
