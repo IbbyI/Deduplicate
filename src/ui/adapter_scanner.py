@@ -26,7 +26,7 @@ def find_duplicates_ui(
         list[list[Path]]: Nested List of Path objects of duplicate files found.
         None: If no duplicate files are found, returns None.
     """
-    info(f"Scanning Path: {start_path}")
+    info(f"Scanning Path: {start_path}", style="")
     progress.start()
     try:
         progress.add_task("[purple]Searching for Duplicates...", total=None)
@@ -35,7 +35,7 @@ def find_duplicates_ui(
         groups: list[list[Path]] | None = find_duplicates(
             start_path, ignore_path, hash_func
         )
-
+        
         number_of_unique = len(groups) if groups is not None else 0
         log(level="info", message=f"Unique Files Found: {number_of_unique}")
         return groups
