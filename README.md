@@ -1,11 +1,14 @@
 # 🧹 **Deduplicate**
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python)](https://www.python.org/)
+[![Tests](https://github.com/IbbyI/deduplicate/workflows/Tests%20%26%20Coverage/badge.svg)](https://github.com/IbbyI/deduplicate/actions)
+[![codecov](https://codecov.io/gh/IbbyI/deduplicate/branch/main/graph/badge.svg)](https://codecov.io/gh/IbbyI/deduplicate)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![PyPI](https://img.shields.io/pypi/v/deduplicate-cli.svg?color=blue)](https://pypi.org/project/deduplicate-cli/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/Platform-Cross--platform-green)
 ![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 
 A lightweight, fast command-line Python tool that scans directories for duplicate files using **SHA-256 hashing**.
 It identifies identical files across nested folders.
