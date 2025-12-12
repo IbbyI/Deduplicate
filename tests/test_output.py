@@ -20,7 +20,9 @@ TEST_DATA = [
 
 class TestOutputFunction(unittest.TestCase):
     def test_txt_file_output(self):
-        with tempfile.NamedTemporaryFile(mode="w+", suffix=".txt", delete=False) as temp:
+        with tempfile.NamedTemporaryFile(
+            mode="w+", suffix=".txt", delete=False
+        ) as temp:
             table = tabulate(TEST_DATA, headers=OUTPUT_FILE_HEADERS, missingval="N/A")
             write_txt_output(
                 TEST_DATA, output_file=Path(temp.name), file_headers=OUTPUT_FILE_HEADERS
@@ -29,7 +31,9 @@ class TestOutputFunction(unittest.TestCase):
         self.assertEqual(temp_file_contents, table)
 
     def test_csv_file_output(self):
-        with tempfile.NamedTemporaryFile(mode="w+", suffix=".csv", delete=False) as temp:
+        with tempfile.NamedTemporaryFile(
+            mode="w+", suffix=".csv", delete=False
+        ) as temp:
             write_csv_output(
                 [TEST_DATA],
                 output_file=Path(temp.name),
