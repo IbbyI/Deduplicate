@@ -1,9 +1,9 @@
 from pathlib import Path
-from rich.progress import Progress
 from typing import Callable
+from rich.progress import Progress
 
-from ui.display import info, error
 from ui.verbose import verbose
+from ui.display import info, error
 
 from core.log import log
 from core.scanner import find_duplicates
@@ -35,7 +35,7 @@ def find_duplicates_ui(
         groups: list[list[Path]] | None = find_duplicates(
             start_path, ignore_path, hash_func
         )
-        
+
         number_of_unique = len(groups) if groups is not None else 0
         log(level="info", message=f"Unique Files Found: {number_of_unique}")
         return groups
