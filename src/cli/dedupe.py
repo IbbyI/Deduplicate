@@ -30,7 +30,7 @@ def build_parser() -> argparse.Namespace:
         "-VER",
         "--version",
         action="version",
-        version="Deduplicate 1.2.5",
+        version="Deduplicate 1.2.6",
         help="Show Program Version.",
     )
     parser.add_argument(
