@@ -4,11 +4,11 @@ from pathlib import Path
 from ui.verbose import set_verbose
 from ui.display import error, success
 from ui.adapter_hasher import choose_hash_func
+from ui.adapter_output import handle_output_file
 from ui.adapter_scanner import find_duplicates_ui
 from ui.adapter_comperator import compare_files_ui, print_total_duplicates
 from ui.adapter_actions import (
     confirm_delete,
-    handle_output_file,
     handle_delete,
     handle_move,
 )
@@ -30,7 +30,7 @@ def build_parser() -> argparse.Namespace:
         "-VER",
         "--version",
         action="version",
-        version="Deduplicate 1.2.4",
+        version="Deduplicate 1.2.5",
         help="Show Program Version.",
     )
     parser.add_argument(
