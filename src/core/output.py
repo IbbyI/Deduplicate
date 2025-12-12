@@ -43,11 +43,11 @@ def write_txt_output(
 def write_csv_output(
     output_file_data: list[list[str]], output_file: Path, file_headers: list[str]
 ) -> None:
-    with open(output_file, "w") as f:
+    with open(output_file, "w", newline="", encoding='utf-8') as f:
         csvwriter = csv.writer(f)
 
         csvwriter.writerow(file_headers)
-        csvwriter.writerows([p for p in output_file_data])
+        csvwriter.writerows(output_file_data)
 
 
 def write_db_output(output_file_data: list[list[str]], output_file: Path) -> None:
