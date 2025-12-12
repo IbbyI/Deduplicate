@@ -9,3 +9,4 @@ platformdirs==4.5.0
 Pygments==2.19.2
 pytokens==0.2.0
 rich==14.2.0
+tabulate==0.9.0
