@@ -8,6 +8,8 @@ env/
 output.txt
 *.log
 *.csv
+*.db
+*.sqlite
 
 # Python
 */__pycache__/
