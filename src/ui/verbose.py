@@ -33,9 +33,7 @@ def verbose(context=None) -> Callable:
 
             if VERBOSE:
                 if callable(context):
-                    print_verbose(context(args, result))
-                elif isinstance(context, str):
-                    print_verbose(f"[VERBOSE] {context}")
+                    print_verbose(f"[VERBOSE] {context(args, result)}")
 
             return result
 
