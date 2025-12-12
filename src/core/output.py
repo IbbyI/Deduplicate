@@ -1,12 +1,13 @@
 import os
 import csv
+import time
 import sqlite3
 import datetime
-import time
-import logging
-from tabulate import tabulate
 
 from pathlib import Path
+from tabulate import tabulate
+
+from core.log import log
 
 
 def output_file_format(duplicate_files: list[Path]) -> list[list[str]]:
@@ -43,7 +44,7 @@ def write_txt_output(
 def write_csv_output(
     output_file_data: list[list[str]], output_file: Path, file_headers: list[str]
 ) -> None:
-    with open(output_file, "w", newline="", encoding='utf-8') as f:
+    with open(output_file, "w", newline="", encoding="utf-8") as f:
         csvwriter = csv.writer(f)
 
         csvwriter.writerow(file_headers)
@@ -63,7 +64,7 @@ def write_db_output(output_file_data: list[list[str]], output_file: Path) -> Non
                 try:
                     con.execute("PRAGMA journal_mode=WAL;")
                 except sqlite3.DatabaseError:
-                    logging.debug("Could not set WAL journal mode.")
+                    log(level="warning", message="Could not set WAL journal mode.")
 
                 cur = con.cursor()
                 cur.execute(
@@ -90,11 +91,9 @@ def write_db_output(output_file_data: list[list[str]], output_file: Path) -> Non
             msg = str(e).lower()
             if "locked" in msg and attempt < max_retries:
                 delay = base_delay * (2 ** (attempt - 1))
-                logging.warning(
-                    "Database is locked, retrying in %.2fs (attempt %d/%d)",
-                    delay,
-                    attempt,
-                    max_retries,
+                log(
+                    level="warning",
+                    message=f"Database is locked, retrying in {'%.2f' % delay}s (attempt {attempt}/{max_retries})",
                 )
                 time.sleep(delay)
                 continue
