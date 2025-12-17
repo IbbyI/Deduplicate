@@ -3,7 +3,10 @@ from typing import Callable
 
 
 def find_duplicates(
-    start_path: Path, ignore_path: Path | None, hash_func: Callable[[Path], str]
+    start_path: Path,
+    ignore_path: Path | None,
+    hash_func: Callable[[Path], str],
+    update_progress: Callable,
 ) -> list[list[Path]] | None:
     """
     Find Duplicate Files in Given Path.
@@ -18,6 +21,7 @@ def find_duplicates(
     """
 
     hashmap: dict[str, list[Path]] = {}
+    processed_files = 0
 
     for file in start_path.rglob("*"):
         if not file.is_file():
@@ -28,4 +32,25 @@ def find_duplicates(
         hashed = hash_func(file)
         hashmap.setdefault(hashed, []).append(file)
 
+        processed_files += 1
+
+        if update_progress and processed_files % 50 == 0:
+            update_progress(processed_files)
+
     return [group for group in hashmap.values() if len(group) > 1]
+
+
+def count_files(start_path: Path) -> int:
+    """
+    Recursively Walks and Counts Total Number of Files
+        Without Reading to Memory.
+    Args:
+        start_path (Path): Path to Search for Duplicate Files.
+    Returns:
+        int: Total Number of Files Found in Directory.
+    """
+    count = 0
+    for f in start_path.rglob("*"):
+        if f.is_file():
+            count += 1
+    return count
