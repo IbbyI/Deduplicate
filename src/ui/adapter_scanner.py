@@ -6,7 +6,7 @@ from ui.verbose import verbose
 from ui.display import info, error
 
 from core.log import log
-from core.scanner import find_duplicates
+from core.scanner import find_duplicates, count_files
 
 progress = Progress()
 
@@ -27,20 +27,22 @@ def find_duplicates_ui(
         None: If no duplicate files are found, returns None.
     """
     info(f"Scanning Path: {start_path}", style="")
-    progress.start()
+    count = count_files(start_path)
     try:
-        progress.add_task("[purple]Searching for Duplicates...", total=None)
-        log(level="info", message=f"Searching for Duplicates in {start_path}")
+        with Progress(transient=True) as progress:
+            task = progress.add_task("[purple]Searching for Duplicates...", total=count)
+            log(level="info", message=f"Searching for Duplicates in {start_path}")
 
-        groups: list[list[Path]] | None = find_duplicates(
-            start_path, ignore_path, hash_func
-        )
+            def update_progress(count: int):
+                progress.update(task, completed=count)
 
-        number_of_unique = len(groups) if groups is not None else 0
-        log(level="info", message=f"Unique Files Found: {number_of_unique}")
-        return groups
+            groups: list[list[Path]] | None = find_duplicates(
+                start_path, ignore_path, hash_func, update_progress
+            )
+
+            number_of_unique = len(groups) if groups is not None else 0
+            log(level="info", message=f"Unique Files Found: {number_of_unique}")
+            return groups
     except Exception as e:
-        error(str(e))
+        error(message="Could Not Search For Duplicates.", style="")
         log(level="error", message=str(e))
-    finally:
-        progress.stop()
