@@ -20,7 +20,7 @@ class TestFileFunction(unittest.TestCase):
             self.assertTrue(
                 type(
                     find_duplicates(
-                        start_path=src_dir, ignore_path=None, hash_func=auto_hash
+                        start_path=src_dir, ignore_path=None, hash_func=auto_hash, update_progress=None
                     )
                 ),
                 list[list[Path]],

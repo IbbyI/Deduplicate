@@ -6,7 +6,7 @@ def find_duplicates(
     start_path: Path,
     ignore_path: Path | None,
     hash_func: Callable[[Path], str],
-    update_progress: Callable,
+    update_progress: Callable | None, 
 ) -> list[list[Path]] | None:
     """
     Find Duplicate Files in Given Path.
