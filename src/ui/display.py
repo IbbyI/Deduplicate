@@ -11,7 +11,7 @@ except ImportError:
 
 
 def info(message: str, style: str | None = None) -> None:
-    rprint(f"[bold {style} cyan]{message}[/]")
+    rprint(f"[bold {style} blue]{message}[/]")
 
 
 def success(message: str, style: str | None = None) -> None:
