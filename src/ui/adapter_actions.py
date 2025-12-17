@@ -70,10 +70,10 @@ def handle_delete(
         level="info",
         message=f"Deleted: {result["deleted"]}, skipped: {result['skipped']}, errors: {result['errors']}",
     )
-    success(f"Deleted {len(result['deleted'])} Files.")
-    warn(f"Skipped: {len(result['skipped'])} Files.")
+    success(f"Deleted {len(result['deleted'])} Files.", style="")
+    warn(f"Skipped: {len(result['skipped'])} Files.", style="")
     if result["errors"]:
-        error(f"Errors: {len(result['errors'])} Files.")
+        error(f"Errors: {len(result['errors'])} Files.", style="")
     return result
 
 

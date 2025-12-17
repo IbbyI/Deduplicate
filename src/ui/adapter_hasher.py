@@ -31,7 +31,7 @@ def full_hash_ui(file: Path) -> str:
         )
         return result
     except Exception as e:
-        error(f"Failed to hash {file.name}: {e}")
+        error(f"Failed to hash {file.name}: {e}", style="")
         raise
 
 
@@ -58,7 +58,7 @@ def quick_hash_ui(file: Path) -> str:
         )
         return result
     except Exception as e:
-        error(f"Failed to hash {file.name}: {e}")
+        error(f"Failed to hash {file.name}: {e}", style="")
         raise
 
 
@@ -85,7 +85,7 @@ def auto_hash_ui(file: Path) -> str:
         )
         return result
     except Exception as e:
-        error(f"Failed to hash {file.name}: {e}")
+        error(f"Failed to hash {file.name}: {e}", style="")
         raise
 
 
