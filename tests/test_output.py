@@ -7,7 +7,12 @@ from pathlib import Path
 from os.path import exists
 from tabulate import tabulate
 
-from core.output import write_csv_output, write_db_output, write_txt_output
+from core.output import (
+    write_csv_output,
+    write_db_output,
+    write_txt_output,
+    output_file_format,
+)
 from ui.adapter_output import OUTPUT_FILE_HEADERS
 
 TEST_DATA = [
@@ -56,6 +61,12 @@ class TestOutputFunction(unittest.TestCase):
                     cursor.execute("CREATE TABLE deduplicate")
             assert exists(temp.name)
             self.assertEqual(list(db_results[0])[1:], TEST_DATA)
+
+    def test_file_format(self):
+        with tempfile.NamedTemporaryFile() as temp:
+            formatted_data = output_file_format([Path(temp.name)])
+            print(len(formatted_data))
+            self.assertEqual(len(formatted_data[0]), 4)
 
 
 if __name__ == "__main__":
