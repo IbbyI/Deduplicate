@@ -6,14 +6,18 @@ from ui.verbose import verbose
 from ui.display import info, error
 
 from core.log import log
-from core.scanner import find_duplicates, count_files
+from core.scanner import find_duplicates
+
 
 progress = Progress()
 
 
 @verbose(lambda args, groups: f"Unique Files Found: {len(groups or [])}")
 def find_duplicates_ui(
-    start_path: Path, ignore_path: Path | None, hash_func: Callable[[Path], str]
+    start_path: Path,
+    total_files: int,
+    ignore_path: Path | None,
+    hash_func: Callable[[Path], str],
 ) -> list[list[Path]] | None:
     """
     Handles UI For Scanning Directory Logic.
@@ -27,10 +31,11 @@ def find_duplicates_ui(
         None: If no duplicate files are found, returns None.
     """
     info(f"Scanning Path: {start_path}", style="")
-    count = count_files(start_path)
     try:
         with Progress(transient=True) as progress:
-            task = progress.add_task("[purple]Searching for Duplicates...", total=count)
+            task = progress.add_task(
+                "[purple]Searching for Duplicates...", total=total_files
+            )
             log(level="info", message=f"Searching for Duplicates in {start_path}")
 
             def update_progress(count: int):

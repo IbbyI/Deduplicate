@@ -12,7 +12,7 @@ progress = Progress()
 
 @verbose(lambda args, files: f"Duplicate Files Found: {len(files or [])}")
 def compare_files_ui(
-    duplicate_files: list[list[Path]], keep_newest_file: bool = False
+    duplicate_files: list[list[Path]], total_files: int, keep_newest_file: bool = False
 ) -> list[Path]:
     """
     Handles UI Elements for the Comparison Logic.
@@ -23,7 +23,7 @@ def compare_files_ui(
     """
     try:
         with Progress(transient=True) as progress:
-            progress.add_task("[purple]Comparing Files            ", total=None)
+            progress.add_task("[purple]Comparing Files            ", total=total_files)
             log(level="info", message="Comparing Files")
             result = compare_files(duplicate_files, keep_newest_file)
             return result
