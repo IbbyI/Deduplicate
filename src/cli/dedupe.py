@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 from ui.verbose import set_verbose
-from ui.display import error, success
+from ui.display import error, success, info
 from ui.adapter_hasher import choose_hash_func
 from ui.adapter_output import handle_output_file
 from ui.adapter_scanner import find_duplicates_ui
@@ -30,7 +30,7 @@ def build_parser() -> argparse.Namespace:
         "-VER",
         "--version",
         action="version",
-        version="Deduplicate 1.2.7",
+        version="Deduplicate 1.2.8",
         help="Show Program Version.",
     )
     parser.add_argument(
@@ -153,14 +153,37 @@ def main(argv=None) -> int:
             error("Start Path is Not a Directory.", style="")
             return 1
 
+        def count_files(start_path: Path, ignore_path: Path | None) -> int:
+            """
+            Recursively Walks and Counts Total Number of Files
+                Without Reading to Memory.
+            Args:
+                start_path (Path): Path to Search for Duplicate Files.
+            Returns:
+                int: Total Number of Files Found in Directory.
+            """
+            count = 0
+            for f in start_path.rglob("*"):
+                if ignore_path and f.is_relative_to(ignore_path):
+                    continue
+                if f.is_file():
+                    count += 1
+            return count
+
+        info("Counting Files...", style="")
+        file_count = count_files(start_path, ignore_path)
+        info(f"{file_count} Files Found.", style="underline")
+
         duplicate_group = find_duplicates_ui(
-            start_path, ignore_path=ignore_path, hash_func=hash_method
+            start_path, file_count, ignore_path=ignore_path, hash_func=hash_method
         )
         if not duplicate_group:
             success("No Duplicates Found!", style="")
             return 0
 
-        duplicate_files = compare_files_ui(duplicate_group, keep_newest_file)
+        duplicate_files = compare_files_ui(
+            duplicate_group, file_count, keep_newest_file
+        )
 
         print_total_duplicates(duplicate_files)
 
