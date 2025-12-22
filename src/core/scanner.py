@@ -6,7 +6,7 @@ def find_duplicates(
     start_path: Path,
     ignore_path: Path | None,
     hash_func: Callable[[Path], str],
-    update_progress: Callable | None, 
+    update_progress: Callable | None,
 ) -> list[list[Path]] | None:
     """
     Find Duplicate Files in Given Path.
@@ -38,19 +38,3 @@ def find_duplicates(
             update_progress(processed_files)
 
     return [group for group in hashmap.values() if len(group) > 1]
-
-
-def count_files(start_path: Path) -> int:
-    """
-    Recursively Walks and Counts Total Number of Files
-        Without Reading to Memory.
-    Args:
-        start_path (Path): Path to Search for Duplicate Files.
-    Returns:
-        int: Total Number of Files Found in Directory.
-    """
-    count = 0
-    for f in start_path.rglob("*"):
-        if f.is_file():
-            count += 1
-    return count
