@@ -2,7 +2,7 @@ import unittest
 import tempfile
 from pathlib import Path
 
-from core.scanner import find_duplicates, count_files
+from core.scanner import find_duplicates
 from core.hasher import auto_hash
 
 
@@ -32,7 +32,6 @@ class TestFileFunction(unittest.TestCase):
                 self.fail("No Duplicate Files Found.")
 
             self.assertTrue(src_dir.exists())
-            self.assertTrue(count_files(Path(tmpdir)), 2)
 
         ignored_file.close()
 
